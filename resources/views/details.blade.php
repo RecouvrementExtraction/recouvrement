@@ -148,7 +148,7 @@
                                 <td>
                                     <form action="{{ route('enregistrer_commentaire') }}" method="post" class="mx-5">
                                         @csrf
-                                        <textarea name="message" cols="20" rows="2"></textarea>
+                                        <textarea id="commentaire_{{ $donnee->CT_Num}}" class="commentaire" name="message" cols="20" rows="2"></textarea>
                                         <input type="hidden" name="id_agent" value="{{ auth()->user()->id }}">
                                         <input type="hidden" name="idClient" value="{{ $donnee->CT_Num }}">
                                         <input type="hidden" name="ligne" value="{{ $donnee->CO_Nom }}">
@@ -159,7 +159,7 @@
                                         <input type="hidden" name="echeance" value="{{ $donnee->EC_Echeance }}">
                                         <input type="hidden" name="debit" value="{{ $totalDebit }}">
                                         <input type="hidden" name="credit" value="{{ $totalCredit }}">
-                                        <button type="submit" class="btn btn-primary">commentaire</button>
+                                        <button id="submitBtn_{{ $donnee->CT_Num}}" type="submit" class="btn btn-primary submitBtn" disabled>commentaire</button>
                                     </form>
                                 </td>
                             </tr>
@@ -220,5 +220,24 @@
             }
         });
     }
+
+
+    // Récupérer tous les champs de commentaire et les boutons de soumission
+    var commentaires = document.querySelectorAll('.commentaire');
+    var submitBtns = document.querySelectorAll('.submitBtn');
+
+    // Ajouter un écouteur d'événement à chaque champ de commentaire
+    commentaires.forEach(function(commentaire, index) {
+        commentaire.addEventListener("input", function() {
+            var submitBtn = submitBtns[index];
+            var commentaireValue = commentaire.value.trim();
+
+            if (commentaireValue !== "") {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        });
+    });
 </script>
 @endsection

@@ -7,10 +7,10 @@
 
 <div id="moa">
     <div class="container my-3">
-        
+
         <h1 class="text-uppercase text-bg-primary text-center">Liste des Clients à rappeler pour le récouvrement</h1>
     </div>
-    <button class="btn btn-primary" onclick="retourPagePrecedente()">Retour</button>
+    <button class="btn btn-primary recherche-bouton" onclick="retourPagePrecedente()">Retour</button>
 
     <div class="card">
         <div class="card-body">
@@ -26,6 +26,7 @@
                         <th>Débit</th>
                         <th>Crédit</th>
                         <th>Message</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,19 +35,22 @@
                             $amount = $donnee->Ec_Montant;
                             $format = number_format($amount, 0, ' ', ' ');
                         @endphp
-                        <tr  data-ct-num="{{ $donnee->CT_Num }}">
+                        <tr data-ct-num="{{ $donnee->CT_Num }}">
                             <td>{{ $donnee->ligne }}</td>
                             <td>{{ $donnee->idClient }}</td>
                             <td>{{ $donnee->libelle }}</td>
                             <td>{{ !empty($donnee->CT_EMail) ? $donnee->CT_EMail : 'emailClient@gmail.com' }}</td>
                             <td>{{ $donnee->telephone }}</td>
-                            <td>{{ $donnee->num_facture }}</td>             
-                            <td>{{ $donnee->credit }}</td>             
-                            <td>{{ $donnee->debit }}</td>             
-                            <td>{{ $donnee->message }}</td>             
+                            <td>{{ $donnee->num_facture }}</td>
+                            <td>{{ $donnee->credit }}</td>
+                            <td>{{ $donnee->debit }}</td>
+                            <td>{{ $donnee->message }}</td>
+                            <td>
+                                <button class="btn btn-danger delete-row">Supprimer</button> <!-- Bouton de suppression -->
+                            </td>
                         </tr>
                     @endforeach
-                </tbody>              
+                </tbody>
             </table>
         </div>
     </div>
