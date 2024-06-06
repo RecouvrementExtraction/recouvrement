@@ -16,7 +16,7 @@ class MonController extends Controller
 {
     public function montrer(Request $request){
         $dataBase = MonModel::select(
-            'JM_Date', 
+            'JM_Date',
             'JO_Num',
              'CT_Num',
               'EC_RefPiece',
@@ -45,41 +45,53 @@ class MonController extends Controller
         return view('faux',compact('data'));
     }
 
-    
-    
 
-    public function details($CT_Num){
+
+    public function details(Request $request, $CT_Num)
+    {
+        $query = $request->input('search');
+
         $data = DB::table('F_ECRITUREC')
-        ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
-        ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')
-        ->join('portefeuilles', 'F_COLLABORATEUR.CO_Nom', '=', 'portefeuilles.name')
-        ->join('portefeuille_user', 'portefeuilles.id', '=', 'portefeuille_user.portefeuille_id')
-        ->join('users', 'portefeuille_user.user_id', '=', 'users.id')
-        ->select(
-            'F_COMPTET.CO_No',
-            'F_COMPTET.CT_Intitule',
-            'F_COMPTET.CT_Telephone',
-            'F_COMPTET.CT_EMail',
-            'F_COLLABORATEUR.CO_Nom',
-            'F_ECRITUREC.CT_Num',
-            'F_ECRITUREC.EC_Intitule',
-            'F_ECRITUREC.EC_sens',
-            'F_ECRITUREC.Ec_Montant',
-            'F_ECRITUREC.EC_Echeance',
-            'F_ECRITUREC.EC_RefPiece',
-            'F_ECRITUREC.EC_Lettre',
-        )
-        ->where('F_ECRITUREC.CT_Num', '=', $CT_Num)
-        ->where('F_ECRITUREC.EC_Lettre','=', 0)
-        ->where('F_ECRITUREC.CT_Num', 'like', 'CL%')
-        // ->whereYear('EC_Echeance','2023')
-        ->get();
-        return view('details', compact('data'));
+            ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
+            ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')
+            ->join('portefeuilles', 'F_COLLABORATEUR.CO_Nom', '=', 'portefeuilles.name')
+            ->join('portefeuille_user', 'portefeuilles.id', '=', 'portefeuille_user.portefeuille_id')
+            ->join('users', 'portefeuille_user.user_id', '=', 'users.id')
+            ->select(
+                'F_COMPTET.CO_No',
+                'F_COMPTET.CT_Intitule',
+                'F_COMPTET.CT_Telephone',
+                'F_COMPTET.CT_EMail',
+                'F_COLLABORATEUR.CO_Nom',
+                'F_ECRITUREC.CT_Num',
+                'F_ECRITUREC.EC_Intitule',
+                'F_ECRITUREC.EC_sens',
+                'F_ECRITUREC.Ec_Montant',
+                'F_ECRITUREC.EC_Echeance',
+                'F_ECRITUREC.EC_RefPiece',
+                'F_ECRITUREC.EC_Lettre'
+            )
+            ->where('F_ECRITUREC.CT_Num', '=', $CT_Num)
+            ->where('F_ECRITUREC.EC_Lettre', '=', 0)
+            ->where('F_ECRITUREC.CT_Num', 'like', 'CL%')
+            ->when($query, function ($q) use ($query) {
+                return $q->where(function ($queryBuilder) use ($query) {
+                    $queryBuilder->where('F_COMPTET.CT_Intitule', 'like', "%$query%")
+                        ->orWhere('F_COMPTET.CT_Telephone', 'like', "%$query%")
+                        ->orWhere('F_COMPTET.CT_EMail', 'like', "%$query%")
+                        ->orWhere('F_COLLABORATEUR.CO_Nom', 'like', "%$query%")
+                        ->orWhere('F_ECRITUREC.EC_Intitule', 'like', "%$query%");
+                });
+            })
+            ->paginate(10); // Utilisation de paginate pour la pagination
+
+        return view('details', compact('data', 'CT_Num'));
     }
 
 
 
-    
+
+
     public function fusion()
     {
         $data = ModelCompteT ::join('F_ECRITUREC', 'F_COMPTET.CT_Num', '=', 'F_ECRITUREC.CT_Num')
@@ -89,7 +101,7 @@ class MonController extends Controller
         ->orderBy('F_ECRITUREC.CT_Num')
         ->whereYear('EC_Echeance','2023')
         ->get();
-       
+
         return view('jointure',compact('data'));
     }
 
@@ -98,7 +110,7 @@ class MonController extends Controller
     {
         // Récupérez les données de la colonne "CO_No" depuis la table "F_CompteT" avec la condition whereYear
         $donneesCO_No = ModelCollaborateurs::select('CO_Nom')->pluck('CO_Nom');
-    
+
         // Parcourez les données et créez des enregistrements dans la table "portefeuille" uniquement s'ils n'existent pas déjà
         foreach ($donneesCO_No as $coNo) {
             if (!Portefeuille::where('name', $coNo)->exists()) {
@@ -107,7 +119,7 @@ class MonController extends Controller
                 $portefeuille->save();
             }
         }
-    
+
         return "Mise à jour de la colonne name de la table Portefeuille.";
     }
 
@@ -118,7 +130,7 @@ class MonController extends Controller
             'idClient' => 'required',
         ]);
 
-        
+
         $id_agent = $request->input('id_agent');
         $idClient = $request->input('idClient');
         $ligne = $request->input('ligne');
@@ -138,7 +150,7 @@ class MonController extends Controller
 
         if (!$existingRecord) {
             // Gérer le cas où un enregistrement avec le même 'libelle' existe déjà
-          
+
         DB::transaction(function () use ($ligne, $idClient, $libelle, $email, $telephone, $num_facture, $credit, $debit, $id_agent) {
             DB::table('recouvrements')->insert([
                 'ligne' => $ligne,
@@ -152,7 +164,7 @@ class MonController extends Controller
                 'id_agent' => $id_agent,
             ]);
         });
-        
+
     // Ajouter le libellé à la liste des libellés ajoutés
     $addedLibelles = session('addedLibelles', []);
     $addedLibelles[] = $libelle;

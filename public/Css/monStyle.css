@@ -23,3 +23,15 @@ body, html {
 #moa{
   margin: 10px;
 }
+.imprimer-bouton {
+    display: block;
+}
+
+
+@media print{
+
+    .imprimer-bouton {
+        display: none;
+    }
+
+}

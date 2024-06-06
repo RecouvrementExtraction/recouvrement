@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -36,13 +36,15 @@ class HomeController extends Controller
     // }
 
 
-    public function index(){
+    public function index(Request $request)
+    {
         // Vérifiez d'abord si un utilisateur est connecté
         if (Auth::check()) {
             // Récupérez l'ID de l'utilisateur connecté
             $userId = Auth::id();
-        
-            // Maintenant, vous pouvez utiliser $userId dans votre requête
+            $query = $request->input('search');
+
+            // Utiliser $userId dans la requête
             $data = DB::table('F_ECRITUREC')
                 ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
                 ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')
@@ -61,17 +63,27 @@ class HomeController extends Controller
                     'F_ECRITUREC.Ec_Montant',
                     'F_ECRITUREC.EC_Echeance',
                     'F_ECRITUREC.EC_RefPiece',
-                    'F_ECRITUREC.EC_Lettre',
+                    'F_ECRITUREC.EC_Lettre'
                 )
-                ->where('F_ECRITUREC.EC_Lettre','=', 0)
+                ->where('F_ECRITUREC.EC_Lettre', '=', 0)
                 ->where('F_ECRITUREC.CT_Num', 'like', 'CL%')
                 ->where('users.id', '=', $userId)
+                ->when($query, function ($q) use ($query) {
+                    return $q->where(function ($queryBuilder) use ($query) {
+                        $queryBuilder->where('F_COMPTET.CT_Intitule', 'like', "%$query%")
+                            ->orWhere('F_COMPTET.CT_Telephone', 'like', "%$query%")
+                            ->orWhere('F_COMPTET.CT_EMail', 'like', "%$query%")
+                            ->orWhere('F_COLLABORATEUR.CO_Nom', 'like', "%$query%")
+                            ->orWhere('F_ECRITUREC.EC_Intitule', 'like', "%$query%");
+                    });
+                })
                 ->orderBy('F_ECRITUREC.CT_Num')
-                ->get();
-                return view('home', compact('data'));
+                ->paginate(10); // Pagination à 10 éléments par page
+
+            return view('home', compact('data'));
         } else {
             return redirect()->back();
         }
-        
-            }
+    }
+
 }
