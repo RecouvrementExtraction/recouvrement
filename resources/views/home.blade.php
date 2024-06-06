@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
-<div class="mt-5">
+<link rel="stylesheet" href="{{asset('Css/home.css')}}">
+<div class="mt-5 mx-5">
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
@@ -10,7 +11,7 @@
                         <div class="form-group">
                             <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
                         </div>
-                        <button type="submit" class="btn btn-primary">Rechercher</button>
+                        <button type="submit" class="btn btn-primary retour-bouton">Rechercher</button>
                     </form>
                     @if(count($data) > 0)
                     <table class="table table-bordered" id="myTable" >

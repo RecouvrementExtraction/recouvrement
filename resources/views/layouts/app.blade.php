@@ -12,6 +12,7 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    <link rel="stylesheet" href="{{asset('Css/app.css')}}">
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -19,9 +20,12 @@
 <body>
     <div id="app" class="mt-1">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm mt-1 imprimer-bouton">
+            <div class="mr-auto">
+                <img src="/images/log.png" alt="Logo de l'entreprise" height="50" width="100">
+            </div>
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/home') }}">
-                    {{__('accueil')}}
+                <a class="navbar-brand dropdown-item" href="{{ url('/home') }}">
+                    {{__('Accueil')}}
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
@@ -58,7 +62,7 @@
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                                        {{ __("Déconnexion") }}
                                     </a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">

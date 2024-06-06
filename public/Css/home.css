@@ -1,0 +1,7 @@
+#searchInput {
+    width: 150px; /* Ajustez la largeur selon vos besoins */
+}
+.recherche-bouton, .retour-bouton {
+    margin-top: 10px; /* 10px de marge en haut */
+    margin-bottom: 10px; /* 10px de marge en bas */
+}
