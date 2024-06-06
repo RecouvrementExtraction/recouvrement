@@ -26,7 +26,7 @@
                         <th>Débit</th>
                         <th>Crédit</th>
                         <th>Message</th>
-                        <th>Action</th>
+                        <th>Action</th> <!-- Nouvelle colonne pour les actions -->
                     </tr>
                 </thead>
                 <tbody>
@@ -46,16 +46,19 @@
                             <td>{{ $donnee->debit }}</td>
                             <td>{{ $donnee->message }}</td>
                             <td>
-                                <button class="btn btn-danger delete-row">Supprimer</button> <!-- Bouton de suppression -->
+                                <form action="{{ route('supprimer_ligne', $donnee->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+
         </div>
     </div>
-
-
 </div>
  <script src="{{asset('Js/details.js')}}"></script>
 @endsection

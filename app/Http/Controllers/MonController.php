@@ -231,6 +231,18 @@ class MonController extends Controller
     }
 
 
+    public function supprimer_ligne($id)
+    {
+        // Trouver la ligne par son ID et la supprimer
+        $ligne = Commentaire::find($id);
+
+        if ($ligne) {
+            $ligne->delete();
+            return redirect()->back()->with('success', 'Ligne supprimée avec succès.');
+        }
+
+        return redirect()->back()->with('error', 'Ligne non trouvée.');
+    }
 
 
 }
