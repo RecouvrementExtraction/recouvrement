@@ -48,3 +48,21 @@
 #navbarDropdown:hover {
     color: #0a18db8c; /* Couleur du texte au survol */
 }
+
+
+
+.custom-register-link {
+    color: #ffffff; /* Couleur de texte par défaut */
+    background-color: #007bff; /* Couleur de fond par défaut */
+    border-radius: 5px; /* Coins arrondis */
+    padding: 10px 20px; /* Espacement interne */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transition douce */
+    text-decoration: none; /* Supprimer la décoration de texte */
+}
+
+.custom-register-link:hover {
+    color: #fdfdfd; /* Couleur de texte au survol */
+    background-color: #ffffff; /* Couleur de fond au survol */
+    border: 1px solid #007bff; /* Bordure au survol */
+    text-decoration: underline; /* Soulignement au survol */
+}

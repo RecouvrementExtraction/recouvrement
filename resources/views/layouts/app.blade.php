@@ -13,7 +13,6 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('Css/app.css')}}">
-
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
@@ -24,7 +23,7 @@
                 <img src="/images/log.png" alt="Logo de l'entreprise" height="50" width="100">
             </div>
             <div class="container">
-                <a class="navbar-brand dropdown-item" href="{{ url('/home') }}">
+                <a class="navbar-brand custom-register-link" href="{{ url('/home') }}">
                     {{__('Accueil')}}
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -48,10 +47,12 @@
                             @endif --}}
 
                             @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
+                            <li class="nav-item">
+                                <a href="{{ route('register') }}" class="navbar-brand custom-register-link">
+                                    {{ __("S'enregistrer") }}
+                                </a>
+                            </li>
+                        @endif
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
