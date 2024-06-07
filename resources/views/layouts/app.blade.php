@@ -17,7 +17,7 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
-    <div id="app" class="mt-1">
+    <div id="app" class="d-flex flex-column min-vh-100 mt-1">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm mt-1 imprimer-bouton">
             <div class="mr-auto">
                 <img src="/images/log.png" alt="Logo de l'entreprise" height="50" width="100">
@@ -79,12 +79,19 @@
             </div>
         </nav>
 
-        <main class="py-4">
+        <main class="flex-grow-1 py-4">
             @yield('content')
         </main>
+
+        <footer class="footer mt-auto py-3 fixed-bottom">
+            <div class="container text-center">
+                <span class="text-muted">© {{ date('Y') }} <a href="https://igf-sn.com/" target="_blank">IGF-sn</a>. Tous droits réservés.</span>
+            </div>
+        </footer>
     </div>
- {{--Appel script personnalisé--}}
- {{-- <script src="{{asset('Js/fusion.js')}}"></script> --}}
- <link rel="stylesheet" href="{{asset('Css/monStyle.css')}}">
+    {{--Appel script personnalisé--}}
+    {{-- <script src="{{asset('Js/fusion.js')}}"></script> --}}
+    <link rel="stylesheet" href="{{asset('Css/monStyle.css')}}">
+
 </body>
 </html>
