@@ -85,10 +85,31 @@ class MonController extends Controller
             })
             ->paginate(10); // Utilisation de paginate pour la pagination
 
-        return view('details', compact('data', 'CT_Num'));
+            $solde = $this->calculerSolde($data);
+
+            // Passer les données et le solde à la vue
+            return view('details', compact('data', 'solde','CT_Num'));
+        // return view('details', compact('data', 'CT_Num'));
     }
 
 
+    private function calculerSolde($data)
+    {
+        $solde = 0;
+
+        // Parcourir les données pour calculer le solde
+        foreach ($data as $item) {
+            if ($item->EC_sens > 0) {
+                // Si EC_sens est positif, c'est un crédit
+                $solde += $item->Ec_Montant;
+            } else {
+                // Sinon, c'est un débit
+                $solde -= $item->Ec_Montant;
+            }
+        }
+
+        return $solde;
+    }
 
 
 
@@ -172,8 +193,9 @@ class MonController extends Controller
     session(['addedLibelles' => $addedLibelles]);
 
     return redirect()->back()->with('message', 'Enregistrement inséré avec succès.');
-    }  return redirect()->back()->with('message', 'Un enregistrement avec le même libellé existe déjà.');
-        }
+        }  return redirect()->back()->with('message', 'Un enregistrement avec le même libellé existe déjà.');
+    }
+
 
 
 

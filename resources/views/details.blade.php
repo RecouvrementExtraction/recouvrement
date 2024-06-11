@@ -5,12 +5,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
 
 
+
 <div id="moa">
     <div id="alertMessage" class="alert-message">
         <!-- Le contenu du message d'alerte sera inséré ici -->
     </div>
 
-    <button class="btn btn-primary imprimer-bouton retour-bouton mx-0" onclick="retourPagePrecedente()"><i class="bi bi-arrow-left"></i></button>
+    {{-- <button class="btn btn-primary imprimer-bouton retour-bouton mx-0" onclick="retourPagePrecedente()"><i class="bi bi-arrow-left"></i>Retour</button> --}}
+    <button class="btn btn-primary"><a href="/home" class="text-light"><i class="bi bi-arrow-left">Retour</i></a></button>
+
 
     <div class="header">
         <div class="header-left">
@@ -61,14 +64,14 @@
                 <thead>
                     <tr>
                         <th>Ligne</th>
-                        <th class="col-2">Téléphone</th>
+                        <th>Téléphone</th>
                         <th>Email</th>
                         <th>N° facture</th>
-                        <th class="col-2">Libellé</th>
+                        <th>Libellé</th>
                         <th>Echeance</th>
                         <th>Rétard</th>
-                        <th class="col-2">Débit</th>
-                        <th class="col-2">Crédit</th>
+                        <th>Débit</th>
+                        <th>Crédit</th>
                         <th>Action</th>
                         <th class="col-2">Rappel</th>
                     </tr>
@@ -85,20 +88,20 @@
                             $format = number_format($amount, 0, ' ', ' ');
                         @endphp
                         @if(!in_array($donnee->EC_Intitule, session('addedLibelles', [])))
-                            <tr data-ct-num="{{ $donnee->CT_Num }}" class="text-center">
-                                <td>{{ $donnee->CO_Nom }}</td>
-                                <td>{{ $donnee->CT_Telephone }}</td>
-                                <td>{{ !empty($donnee->CT_EMail) ? $donnee->CT_EMail : 'emailClient@gmail.com' }}</td>
-                                <td>{{ $donnee->EC_RefPiece }}</td>
-                                <td>{{ $donnee->EC_Intitule }}</td>
-                                <td>{{ (new DateTime($donnee->EC_Echeance))->format('d/m/Y') }}</td>
+                            <tr data-ct-num="{{ $donnee->CT_Num }}">
+                                <td class="table-cell">{{ $donnee->CO_Nom }}</td>
+                                <td class="table-cell">{{ $donnee->CT_Telephone }}</td>
+                                <td class="table-cell">{{ !empty($donnee->CT_EMail) ? $donnee->CT_EMail : 'emailClient@gmail.com' }}</td>
+                                <td class="table-cell">{{ $donnee->EC_RefPiece }}</td>
+                                <td class="table-cell">{{ $donnee->EC_Intitule }}</td>
+                                <td class="table-cell">{{ (new DateTime($donnee->EC_Echeance))->format('d/m/Y') }}</td>
                                 <td class="retard" style="color: #ff0000">
                                     @php
                                         $date1 = new DateTime($donnee->EC_Echeance);
                                         $date2 = new DateTime();
                                         $intervalle = $date2->diff($date1);
                                         $nj = $intervalle->format('%a');
-                                        echo ($nj > 100) ? '' : $nj;
+                                        echo ($nj > 100) ? '+100' : $nj;
                                     @endphp
                                 </td>
                                 <td>
@@ -132,7 +135,7 @@
                                     @endphp
                                 </td>
                                 <td>
-                                    <form action="{{ route('enregistrer_ligne') }}" method="post">
+                                    <form action="{{ route('enregistrer_ligne') }}" method="post" class="text-center">
                                         @csrf
                                         <input type="hidden" name="id_agent" value="{{ auth()->user()->id }}">
                                         <input type="hidden" name="idClient" value="{{ $donnee->CT_Num }}">
@@ -145,8 +148,8 @@
                                         <input type="hidden" name="debit" value="{{ $totalDebit }}">
                                         <input type="hidden" name="credit" value="{{ $totalCredit }}">
                                         {{-- <button type="submit" class="btn btn-primary">Recouvre</button> --}}
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="bi bi-check-circle"></i>
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="bi bi-check-circle" title="Récouvrer"></i>
                                         </button>
                                     </form>
                                 </td>
@@ -156,8 +159,8 @@
                                         <div class="input-group date">
                                             <input type="text" class="form-control datepicker datepicker_{{ $donnee->CT_Num }}" readonly>
                                             <div class="input-group-append">
-                                                <button class="btn btn-warning dateBtn dateBtn_{{ $donnee->CT_Num }}" type="button"><i class="bi bi-calendar"></i></button>
-                                                <button id="submitBtn_{{ $donnee->CT_Num}}" type="button" class="btn btn-primary submitBtn" data-date-field="date_{{ $donnee->CT_Num }}" ><i class="bi bi-send"></i></button>
+                                                <button class="btn btn-warning dateBtn datepicker datepicker_{{ $donnee->CT_Num }}" type="button"><i class="bi bi-calendar"></i></button>
+                                                <button id="submitBtn_{{ $donnee->CT_Num}}" type="button" class="btn btn-primary submitBtn btn-sm" data-date-field="date_{{ $donnee->CT_Num }}" ><i class="bi bi-send"></i></button>
                                             </div>
                                         </div>
                                         <input type="hidden" name="id_agent" value="{{ auth()->user()->id }}">
@@ -185,21 +188,22 @@
 
             <div class="mb-3 justify-content-center">
                 @php
-                    $solde = $totalDebit - $totalCredit;
+                    $solde1 = $totalDebit - $totalCredit;
                 @endphp
                 <span class="total-debit">Total Débit : {{ number_format($totalDebit, 0, ' ', ' ') }}</span>
                 <span class="total-credit">Total Crédit : {{ number_format($totalCredit, 0, ' ', ' ') }}</span>
-                <span class="solde">Solde : {{ number_format($solde, 0, ' ', ' ') }}</span>
+                <span class="solde">Solde : {{ number_format($solde1, 0, ' ', ' ') }}</span>
             </div>
         </div>
     </div>
 
     <!-- Boutons d'impression et de navigation -->
     <div class="btn-group m-2">
-        <button class="btn btn-success imprimer-bouton m-3" onclick="imprimerPage()"><i class="bi bi-printer"></i></button>
-        <a href="/client_recouvre/{{ auth()->user()->id }}" class="btn btn-warning imprimer-bouton m-3"><i class="bi bi-people"></i></a>
-        <a href="/client_rappel/{{ auth()->user()->id }}" class="btn btn-info imprimer-bouton m-3"><i class="bi bi-chat-dots"></i></a>
+        <button class="btn btn-success imprimer-bouton m-3" onclick="imprimerPage()" title="Imprimer la page"><i class="bi bi-printer"></i></button>
+        <a href="/client_recouvre/{{ auth()->user()->id }}" class="btn btn-warning imprimer-bouton m-3" title="Factures récouvrées"><i class="bi bi-people"></i></a>
+        <a href="/client_rappel/{{ auth()->user()->id }}" class="btn btn-info imprimer-bouton m-3" title="Clients à rappeler"><i class="bi bi-chat-dots"></i></a>
     </div>
+    <div>Solde actuel : {{ $solde }}</div>
 </div>
 
 <script src="{{ asset('Js/details.js') }}"></script>
@@ -262,5 +266,19 @@
 });
 
 
+// document.addEventListener('DOMContentLoaded', function () {
+//         const cells = document.querySelectorAll('.table-cell');
+
+//         cells.forEach(cell => {
+//             const maxLength = 15; // Définir le nombre maximum de caractères
+//             const originalText = cell.textContent;
+
+//             if (originalText.length > maxLength) {
+//                 const truncatedText = originalText.substring(0, maxLength) + '...';
+//                 cell.textContent = truncatedText;
+//                 cell.setAttribute('title', originalText); // Afficher le texte complet en survolant la cellule
+//             }
+//         });
+//     });
 </script>
 @endsection

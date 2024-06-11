@@ -14,12 +14,12 @@
                     <table class="table table-striped text-center">
                         <thead>
                             <tr>
-                            <th>#</th>
-                            <th>Nom</th>
-                            <th>Email</th>
-                            <th>Rôles</th>
-                            <th>Portefeuilles</th>
-                            <th>Action</th>
+                                <th>#</th>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Rôles</th>
+                                <th>Portefeuilles</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -35,23 +35,26 @@
                                 <td> {{ implode(' / ',$user->portefeuilles()->get()->pluck('name')->toArray()) }} </td>
                                 <td>
                                     @can('edit-users')
-                                    <a href="{{route('admin.users.edit', $user->id)}}"><button class="btn btn-success">Editer</button></a>
+                                    <a href="{{ route('admin.users.edit', $user->id) }}">
+                                        <button class="btn btn-success">Editer</button>
+                                    </a>
                                     @endcan
-                                    {{-- permet de masquer le lien vers les utilisateurs si c'est pas un admin connecté --}}
 
-                                    <a href="{{route('admin.users.show', $user->id)}}"><button class="btn btn-warning">Factures</button></a>
+                                    <a href="{{ route('admin.users.show', $user->id) }}">
+                                        <button class="btn btn-warning">Factures</button>
+                                    </a>
 
                                     @can('delete-users')
-                                    <form action="{{route('admin.users.destroy', $user->id)}}" method="post" class="d-inline">
+                                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="post" class="d-inline delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-danger">Supprimer</button>
+                                        <button type="button" class="btn btn-danger delete-button">Supprimer</button>
                                     </form>
                                     @endcan
                                 </td>
                             </tr>
                             @php
-                                $ide +=1;
+                                $ide += 1;
                             @endphp
                             @endforeach
                         </tbody>
@@ -61,4 +64,16 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+                    this.closest('form').submit();
+                }
+            });
+        });
+    });
+</script>
 @endsection

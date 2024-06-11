@@ -10,7 +10,7 @@
     .total-credit,
     .solde {
         font-weight: bold;
-        font-size: 20px;
+        font-size: 15px;
     }
 
     .header {
@@ -167,4 +167,9 @@ th{
 .recherche-bouton, .retour-bouton {
     margin-top: 10px; /* 10px de marge en haut */
     margin-bottom: 10px; /* 10px de marge en bas */
+}
+
+
+.custom-row-height {
+    height: 10px; /* Ajustez la hauteur selon vos besoins */
 }

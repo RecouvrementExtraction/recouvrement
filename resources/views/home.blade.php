@@ -23,7 +23,7 @@
                                 <th>Ligne</th>
                                 <th>Libellé</th>
                                 {{-- <th>N° Facture</th> --}}
-                                <th>Action</th>
+                                <th class="col-1">Action</th>
                                 <th>Solde</th>
                             </tr>
                         </thead>
@@ -87,6 +87,7 @@
 
                             {{-- Fermer la dernière ligne --}}
                             <td>{{ $totalDebit - $totalCredit }}</td>
+                            {{-- <td> {{ number_format($solde, 0, ' ', ' ') }}</td> --}}
                             </tr>
                         </tbody>
                     </table>

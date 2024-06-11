@@ -47,7 +47,7 @@ Route::get('/client_recouvre/{id}', [MonController::class,'client_recouvre']);
 Route::get('/client_rappel/{id}', [MonController::class,'client_rappel']);
 Route::delete('/supprimer-ligne/{id}', [MonController::class,'supprimer_ligne'])->name('supprimer_ligne');
 
-Route::get('/factures_recouvrees/{idClient}', [UserController::class, 'factures_recouvrees'])->name("factures_recouvrees");
+Route::delete('/factures_recouvrees/{idClient}', [UserController::class, 'factures_recouvrees'])->name("factures_recouvrees");
 
 Auth::routes();
 

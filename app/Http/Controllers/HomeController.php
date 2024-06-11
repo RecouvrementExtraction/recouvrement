@@ -80,10 +80,32 @@ class HomeController extends Controller
                 ->orderBy('F_ECRITUREC.CT_Num')
                 ->paginate(10); // Pagination à 10 éléments par page
 
-            return view('home', compact('data'));
+                 // Calculer le solde total
+    $solde = $this->calculerSolde($data);
+
+    return view('home', compact('data', 'solde'));
+
         } else {
             return redirect()->back();
         }
     }
 
+
+    private function calculerSolde($data)
+{
+    $solde = 0;
+
+    // Parcourir les données pour calculer le solde
+    foreach ($data as $item) {
+        if ($item->EC_sens > 0) {
+            // Si EC_sens est positif, c'est un crédit
+            $solde += $item->Ec_Montant;
+        } else {
+            // Sinon, c'est un débit
+            $solde -= $item->Ec_Montant;
+        }
+    }
+
+    return $solde;
+}
 }
