@@ -1,1 +1,1 @@
-alert('');
+alert('Bonjour moa');

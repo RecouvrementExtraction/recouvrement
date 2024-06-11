@@ -140,6 +140,7 @@ class MonController extends Controller
         $telephone = $request->input('telephone');
         $credit = $request->input('credit');
         $debit = $request->input('debit');
+        $debit = $request->input('debit');
 
 
         $libelle = $request->input('libelle');
@@ -207,6 +208,35 @@ class MonController extends Controller
 
         return redirect()->back()->with('message', 'Message ajouter.');
     }
+
+
+    // public function enregistrer_commentaire(Request $request){
+    //     $id_agent = $request->input('id_agent');
+    //     $idClient = $request->input('idClient');
+    //     $ligne = $request->input('ligne');
+    //     $email = $request->input('email');
+    //     $num_facture = $request->input('num_facture');
+    //     $libelle = $request->input('libelle');
+    //     $telephone = $request->input('telephone');
+    //     $message = $request->input('message');
+    //     $credit = $request->input('credit');
+    //     $debit = $request->input('debit');
+
+    //     // Affichage des données dans la console
+    //     dd([
+    //         'ligne' => $ligne,
+    //         'idClient' => $idClient,
+    //         'libelle' => $libelle,
+    //         'email' => $email,
+    //         'telephone' => $telephone,
+    //         'num_facture' => $num_facture,
+    //         'credit' => $credit,
+    //         'debit' => $debit,
+    //         'message' => $message,
+    //         'id_agent' => $id_agent,
+    //     ]);
+    // }
+
 
     // À chaque lancement de l'application
     public function lancementApplication()

@@ -2,13 +2,15 @@
 
 @section('content')
 <link rel="stylesheet" href="{{asset('Css/details.css')}}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+
 
 <div id="moa">
     <div id="alertMessage" class="alert-message">
         <!-- Le contenu du message d'alerte sera inséré ici -->
     </div>
 
-    <button class="btn btn-primary imprimer-bouton retour-bouton" onclick="retourPagePrecedente()">Retour</button>
+    <button class="btn btn-primary imprimer-bouton retour-bouton mx-0" onclick="retourPagePrecedente()"><i class="bi bi-arrow-left"></i></button>
 
     <div class="header">
         <div class="header-left">
@@ -51,24 +53,24 @@
             <form method="GET" action="{{ url('/details', ['CT_Num' => $CT_Num]) }}">
                 <div class="form-group imprimer-bouton">
                     <input type="text" id="searchInput" placeholder="Recherche...">
+                    <button type="submit" class="btn btn-primary imprimer-bouton recherche-bouton" onclick="recherche()"><i class="bi bi-search"></i></button>
                 </div>
-                <button type="submit" class="btn btn-primary imprimer-bouton recherche-bouton" onclick="recherche()">Rechercher</button>
             </form>
-
+            {{-- <a href="/details{{ $donnee->CT_Num }}" class="btn btn-primary" >Moa</a> --}}
             <table class="table table-bordered border-primary" id="myTable">
                 <thead>
                     <tr>
                         <th>Ligne</th>
-                        <th>Téléphone</th>
+                        <th class="col-2">Téléphone</th>
                         <th>Email</th>
                         <th>N° facture</th>
-                        <th>Libellé</th>
+                        <th class="col-2">Libellé</th>
                         <th>Echeance</th>
                         <th>Rétard</th>
                         <th class="col-2">Débit</th>
                         <th class="col-2">Crédit</th>
                         <th>Action</th>
-                        <th class="col-2">Message</th>
+                        <th class="col-2">Rappel</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -142,13 +144,22 @@
                                         <input type="hidden" name="echeance" value="{{ $donnee->EC_Echeance }}">
                                         <input type="hidden" name="debit" value="{{ $totalDebit }}">
                                         <input type="hidden" name="credit" value="{{ $totalCredit }}">
-                                        <button type="submit" class="btn btn-primary">Recouvre</button>
+                                        {{-- <button type="submit" class="btn btn-primary">Recouvre</button> --}}
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
                                     </form>
                                 </td>
                                 <td>
-                                    <form action="{{ route('enregistrer_commentaire') }}" method="post" class="mx-5">
+                                    <form id="form_{{ $donnee->CT_Num }}" action="{{ route('enregistrer_commentaire') }}" method="post" class="mx-5">
                                         @csrf
-                                        <textarea id="commentaire_{{ $donnee->CT_Num}}" class="commentaire" name="message" cols="20" rows="2"></textarea>
+                                        <div class="input-group date">
+                                            <input type="text" class="form-control datepicker datepicker_{{ $donnee->CT_Num }}" readonly>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-warning dateBtn dateBtn_{{ $donnee->CT_Num }}" type="button"><i class="bi bi-calendar"></i></button>
+                                                <button id="submitBtn_{{ $donnee->CT_Num}}" type="button" class="btn btn-primary submitBtn" data-date-field="date_{{ $donnee->CT_Num }}" ><i class="bi bi-send"></i></button>
+                                            </div>
+                                        </div>
                                         <input type="hidden" name="id_agent" value="{{ auth()->user()->id }}">
                                         <input type="hidden" name="idClient" value="{{ $donnee->CT_Num }}">
                                         <input type="hidden" name="ligne" value="{{ $donnee->CO_Nom }}">
@@ -156,10 +167,9 @@
                                         <input type="hidden" name="email" value="emailClient@gmail.com">
                                         <input type="hidden" name="num_facture" value="{{ $donnee->EC_RefPiece }}">
                                         <input type="hidden" name="libelle" value="{{ $donnee->EC_Intitule }}">
-                                        <input type="hidden" name="echeance" value="{{ $donnee->EC_Echeance }}">
                                         <input type="hidden" name="debit" value="{{ $totalDebit }}">
                                         <input type="hidden" name="credit" value="{{ $totalCredit }}">
-                                        <button id="submitBtn_{{ $donnee->CT_Num}}" type="submit" class="btn btn-primary submitBtn" disabled>commentaire</button>
+                                        <input type="hidden" id="date_{{ $donnee->CT_Num }}" name="message" value="Monace">
                                     </form>
                                 </td>
                             </tr>
@@ -186,14 +196,16 @@
 
     <!-- Boutons d'impression et de navigation -->
     <div class="btn-group m-2">
-        <button class="btn btn-success imprimer-bouton m-3" onclick="imprimerPage()">Imprimer</button>
-        <a href="/client_recouvre/{{ auth()->user()->id }}" class="btn btn-warning imprimer-bouton m-3">Clients récouvrés</a>
-        <a href="/client_rappel/{{ auth()->user()->id }}" class="btn btn-info imprimer-bouton m-3">Client à rappeler</a>
+        <button class="btn btn-success imprimer-bouton m-3" onclick="imprimerPage()"><i class="bi bi-printer"></i></button>
+        <a href="/client_recouvre/{{ auth()->user()->id }}" class="btn btn-warning imprimer-bouton m-3"><i class="bi bi-people"></i></a>
+        <a href="/client_rappel/{{ auth()->user()->id }}" class="btn btn-info imprimer-bouton m-3"><i class="bi bi-chat-dots"></i></a>
     </div>
 </div>
 
 <script src="{{ asset('Js/details.js') }}"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script>
     var errorMessage = "{{ session('message') }}";
     if (errorMessage) {
@@ -222,22 +234,33 @@
     }
 
 
-    // Récupérer tous les champs de commentaire et les boutons de soumission
-    var commentaires = document.querySelectorAll('.commentaire');
-    var submitBtns = document.querySelectorAll('.submitBtn');
-
-    // Ajouter un écouteur d'événement à chaque champ de commentaire
-    commentaires.forEach(function(commentaire, index) {
-        commentaire.addEventListener("input", function() {
-            var submitBtn = submitBtns[index];
-            var commentaireValue = commentaire.value.trim();
-
-            if (commentaireValue !== "") {
-                submitBtn.disabled = false;
-            } else {
-                submitBtn.disabled = true;
-            }
-        });
+    $(document).ready(function(){
+    $('.datepicker').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true
     });
+
+    $('.dateBtn').on('click', function() {
+        var index = $(this).attr('id').split('_')[1];
+        $('.datepicker_' + index).datepicker('show');
+    });
+
+    $('.datepicker').on('changeDate', function() {
+        var index = $(this).attr('class').split(' ')[2].split('_')[1];
+        var date = $(this).val();
+        $('#date_' + index).val(date); // Mettre à jour la valeur du champ caché avec la date sélectionnée
+    });
+
+    $('.submitBtn').on('click', function() {
+        var index = $(this).attr('id').split('_')[1];
+        var dateFieldId = $(this).data('date-field');
+        var date = $('#'+dateFieldId).val();
+        $('#'+dateFieldId).val(date); // Mettre à jour la valeur du champ de date caché
+        $('#form_' + index).submit();
+    });
+});
+
+
 </script>
 @endsection

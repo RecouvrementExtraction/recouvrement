@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="my-3">
-                <a href="/ajoute_user" class="btn btn-info">Ajouter un utilisateur</a>
+                <a href="/ajoute_user" class="btn btn-primary">Ajouter un utilisateur</a>
             </div>
             <div class="card">
                 <div class="card-header">List des Agents</div>
@@ -34,14 +34,14 @@
                                 <td> {{ implode(' / ',$user->roles()->get()->pluck('name')->toArray()) }} </td>
                                 <td> {{ implode(' / ',$user->portefeuilles()->get()->pluck('name')->toArray()) }} </td>
                                 <td>
-                                    @can('edit-users') 
+                                    @can('edit-users')
                                     <a href="{{route('admin.users.edit', $user->id)}}"><button class="btn btn-success">Editer</button></a>
                                     @endcan
                                     {{-- permet de masquer le lien vers les utilisateurs si c'est pas un admin connecté --}}
-                                                    
+
                                     <a href="{{route('admin.users.show', $user->id)}}"><button class="btn btn-warning">Factures</button></a>
 
-                                    @can('delete-users') 
+                                    @can('delete-users')
                                     <form action="{{route('admin.users.destroy', $user->id)}}" method="post" class="d-inline">
                                         @csrf
                                         @method('DELETE')

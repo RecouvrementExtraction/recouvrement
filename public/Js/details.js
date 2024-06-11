@@ -49,6 +49,3 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-
-    alert("Monace King")

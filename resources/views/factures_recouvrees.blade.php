@@ -39,15 +39,15 @@
                             <td>{{ $donnee->libelle }}</td>
                             <td>{{ !empty($donnee->CT_EMail) ? $donnee->CT_EMail : 'emailClient@gmail.com' }}</td>
                             <td>{{ $donnee->telephone }}</td>
-                            <td>{{ $donnee->num_facture }}</td>             
-                            <td>{{ $donnee->credit }}</td>             
-                            <td>{{ $donnee->debit }}</td>      
+                            <td>{{ $donnee->num_facture }}</td>
+                            <td>{{ $donnee->credit }}</td>
+                            <td>{{ $donnee->debit }}</td>
                             <td >
                                 <a href="/factures_recouvrees/{{$donnee->idClient}}" class="btn btn-danger">Supprimer</a>
-                            </td>       
+                            </td>
                         </tr>
                     @endforeach
-                </tbody>              
+                </tbody>
             </table>
         </div>
     </div>

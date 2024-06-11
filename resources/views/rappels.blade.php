@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{{asset('Css/details.css')}}">
 
 
-<div id="moa">
+<div id="moa" class="d-flex justify-content-center align-items-center flex-column">
     <div class="container my-3">
 
         <h1 class="text-uppercase text-bg-primary text-center">Liste des Clients à rappeler pour le récouvrement</h1>
@@ -25,7 +25,7 @@
                         <th>N° facture</th>
                         <th>Débit</th>
                         <th>Crédit</th>
-                        <th>Message</th>
+                        <th>Date</th>
                         <th>Action</th> <!-- Nouvelle colonne pour les actions -->
                     </tr>
                 </thead>
