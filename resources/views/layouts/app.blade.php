@@ -13,7 +13,10 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
 
+    <link rel="stylesheet" href="{{ asset('/build/assets/app-041e359a.css') }}">
+    <script src="/build/assets/app-70a4cfe7.js"></script>
     <link rel="stylesheet" href="{{ asset('Css/app.css') }}">
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -21,7 +24,7 @@
 </head>
 <body>
     <div id="app" class="d-flex flex-column min-vh-100">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm imprimer-bouton">
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm imprimer-bouton fixed-top">
             <div class="mr-auto">
                 <img src="/images/log.png" alt="Logo de l'entreprise" height="50" width="100">
             </div>
@@ -77,7 +80,7 @@
             </div>
         </nav>
 
-        <main class="flex-grow-1">
+        <main class="flex-grow-1 mt-5"  style="padding-top: 70px;">
             @yield('content')
         </main>
 

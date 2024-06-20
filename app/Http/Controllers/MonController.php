@@ -50,7 +50,6 @@ class MonController extends Controller
     public function details(Request $request, $CT_Num)
     {
         $query = $request->input('search');
-
         $data = DB::table('F_ECRITUREC')
             ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
             ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')

@@ -45,6 +45,7 @@ class HomeController extends Controller
             $query = $request->input('search');
 
             // Utiliser $userId dans la requête
+            $row = DB::table('recouvrements')->select('idClient','credit','debit');
             $data = DB::table('F_ECRITUREC')
                 ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
                 ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')
@@ -83,7 +84,23 @@ class HomeController extends Controller
                  // Calculer le solde total
     $solde = $this->calculerSolde($data);
 
-    return view('home', compact('data', 'solde'));
+
+    $recouvrements = DB::table('recouvrements')
+    ->select('idClient',
+             DB::raw('SUM(CAST(credit AS FLOAT)) as total_credit'),
+             DB::raw('SUM(CAST(debit AS FLOAT)) as total_debit'),
+             DB::raw('SUM(CAST(credit AS FLOAT)) - SUM(CAST(debit AS FLOAT)) as solde'))
+    ->groupBy('idClient')
+    ->get();
+
+
+    $recouvrementSolde = [];
+
+    // Exemple : bouclez à travers $recouvrements pour obtenir les soldes par CT_Num
+    foreach ($recouvrements as $recouvrement) {
+        $recouvrementSolde[$recouvrement->idClient] = $recouvrement->solde;
+    }
+    return view('home', compact('data', 'solde','recouvrements', 'recouvrementSolde'));
 
         } else {
             return redirect()->back();

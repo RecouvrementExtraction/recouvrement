@@ -4,8 +4,8 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="my-3">
-                <a href="/ajoute_user" class="btn btn-primary">Ajouter un utilisateur</a>
+            <div class="my-3" title="Ajouter un agent">
+                <a href="/ajoute_user" class="btn btn-primary"> <i class="bi bi-plus"></i></a>
             </div>
             <div class="card">
                 <div class="card-header">List des Agents</div>
@@ -35,20 +35,24 @@
                                 <td> {{ implode(' / ',$user->portefeuilles()->get()->pluck('name')->toArray()) }} </td>
                                 <td>
                                     @can('edit-users')
-                                    <a href="{{ route('admin.users.edit', $user->id) }}">
-                                        <button class="btn btn-success">Editer</button>
+                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-success">
+                                        {{-- <button class="btn btn-success">Editer</button> --}}
+                                        <i class="bi bi-pencil" title="Editer l'agent"></i>
                                     </a>
                                     @endcan
 
-                                    <a href="{{ route('admin.users.show', $user->id) }}">
-                                        <button class="btn btn-warning">Factures</button>
+                                    <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-warning" title="voir les factures">
+                                        {{-- <button class="btn btn-warning">Factures</button> --}}
+                                        <i class="bi bi-eye"></i>
                                     </a>
 
                                     @can('delete-users')
                                     <form action="{{ route('admin.users.destroy', $user->id) }}" method="post" class="d-inline delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="btn btn-danger delete-button">Supprimer</button>
+                                        <button type="button" class="btn btn-danger delete-button" title="supprimer l'agent">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     </form>
                                     @endcan
                                 </td>

@@ -33,38 +33,42 @@
 
 
     @media print {
-            /*Masquer les commentaire*/
-            th:nth-child(10), td:nth-child(12) {
-                display: none;
-            }
-
-            /*Masquer les checkbox*/
-            th:nth-child(11), td:nth-child(13) {
+        /* Masquer les commentaire */
+        th:nth-child(10), td:nth-child(12) {
             display: none;
-            }
+        }
 
-            /*Masquer l'échaéance*/
-            td:nth-child(6), th:nth-child(6) {
+        /* Masquer les checkbox */
+        th:nth-child(11), td:nth-child(13) {
             display: none;
-            }
+        }
 
-            /*Masquer les lignes*/
-            td:nth-child(1), th:nth-child(1) {
+        /* Masquer l'échéance */
+        td:nth-child(6), th:nth-child(6) {
             display: none;
-            }
+        }
 
-            /* Rétablir le premier th dans le tableau avec la classe "table-ct" à l'impression */
-            .table-ct th:nth-child(1),
-            .table-ct td:nth-child(1) {
+        /* Masquer les lignes */
+        td:nth-child(1), th:nth-child(1) {
+            display: none;
+        }
+
+        /* Rétablir le premier th dans le tableau avec la classe "table-ct" à l'impression */
+        .table-ct th:nth-child(1),
+        .table-ct td:nth-child(1) {
             display: table-cell;
-            }
+        }
 
+        /* Supprimer le padding-top ajouté pour la barre de navigation fixe */
+        body {
+            padding-top: 0 !important;
+        }
 
-            .table-container {
+        .table-container {
             display: block;
         }
 
-        .header{
+        .header {
             display: block;
         }
 
@@ -72,62 +76,39 @@
             display: none;
         }
 
-            body {
-                font-family: Arial, sans-serif;
-            }
+        .table-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
 
-            .header-left,
-            .header-right {
-                float: left;
-            }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
 
-            .header {
-                width: 100%;
-                overflow: hidden;
-                margin-bottom: 20px;
-            }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
 
-            .header-left p,
-            .header-right p {
-                margin: 0;
-            }
+        th {
+            background-color: #f2f2f2;
+        }
 
-            .table-container {
-                width: 100%;
-                margin-bottom: 20px;
-            }
+        .total {
+            font-weight: bold;
+        }
 
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }
-
-            th, td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-            }
-
-            th {
-                background-color: #f2f2f2;
-            }
-
-            .total {
-                font-weight: bold;
-            }
-
-            .header {
+        .header {
             display: flex;
             justify-content: space-between;
         }
 
-
         .header-left, .header-right {
             flex: 1;
         }
-
-
     }
 
     .retard{

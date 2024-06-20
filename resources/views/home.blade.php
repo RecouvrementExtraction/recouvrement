@@ -95,6 +95,27 @@
                     <p>Aucune donnée disponible.</p>
                     @endif
                 </div>
+                <h1>Recouvrements par Client</h1>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>ID Client</th>
+                            <th>Total Crédit</th>
+                            <th>Total Débit</th>
+                            <th>Solde</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($recouvrements as $recouvrement)
+                            <tr>
+                                <td>{{ $recouvrement->idClient }}</td>
+                                <td>{{ $recouvrement->total_credit }}</td>
+                                <td>{{ $recouvrement->total_debit }}</td>
+                                <td>{{ $recouvrement->solde }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

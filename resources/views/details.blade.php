@@ -1,19 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<link rel="stylesheet" href="{{asset('Css/details.css')}}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
-
-
+<link rel="stylesheet" href="{{ asset('Css/details.css') }}">
 
 <div id="moa">
     <div id="alertMessage" class="alert-message">
         <!-- Le contenu du message d'alerte sera inséré ici -->
     </div>
 
-    {{-- <button class="btn btn-primary imprimer-bouton retour-bouton mx-0" onclick="retourPagePrecedente()"><i class="bi bi-arrow-left"></i>Retour</button> --}}
-    <button class="btn btn-primary"><a href="/home" class="text-light"><i class="bi bi-arrow-left">Retour</i></a></button>
-
+    <button class="btn btn-primary imprimer-bouton"><a href="/home" class="text-light"><i class="bi bi-arrow-left">Retour</i></a></button>
 
     <div class="header">
         <div class="header-left">
@@ -52,14 +47,12 @@
         </div>
 
         <div class="card-body">
-            <!-- Formulaire de recherche -->
             <form method="GET" action="{{ url('/details', ['CT_Num' => $CT_Num]) }}">
                 <div class="form-group imprimer-bouton">
                     <input type="text" id="searchInput" placeholder="Recherche...">
                     <button type="submit" class="btn btn-primary imprimer-bouton recherche-bouton" onclick="recherche()"><i class="bi bi-search"></i></button>
                 </div>
             </form>
-            {{-- <a href="/details{{ $donnee->CT_Num }}" class="btn btn-primary" >Moa</a> --}}
             <table class="table table-bordered border-primary" id="myTable">
                 <thead>
                     <tr>
@@ -147,7 +140,6 @@
                                         <input type="hidden" name="echeance" value="{{ $donnee->EC_Echeance }}">
                                         <input type="hidden" name="debit" value="{{ $totalDebit }}">
                                         <input type="hidden" name="credit" value="{{ $totalCredit }}">
-                                        {{-- <button type="submit" class="btn btn-primary">Recouvre</button> --}}
                                         <button type="submit" class="btn btn-success btn-sm">
                                             <i class="bi bi-check-circle" title="Récouvrer"></i>
                                         </button>
@@ -266,19 +258,19 @@
 });
 
 
-// document.addEventListener('DOMContentLoaded', function () {
-//         const cells = document.querySelectorAll('.table-cell');
-
-//         cells.forEach(cell => {
-//             const maxLength = 15; // Définir le nombre maximum de caractères
-//             const originalText = cell.textContent;
-
-//             if (originalText.length > maxLength) {
-//                 const truncatedText = originalText.substring(0, maxLength) + '...';
-//                 cell.textContent = truncatedText;
-//                 cell.setAttribute('title', originalText); // Afficher le texte complet en survolant la cellule
-//             }
-//         });
-//     });
+// Récupération du solde depuis la page actuelle
+var soldeText = document.querySelector('.solde').textContent;
+var solde = parseFloat(soldeText.replace('Solde : ', '').replace(/\s/g, '').replace(',', '.')); // Conversion en nombre
+$.ajax({
+    type: 'GET',
+    url: '/votre-autre-vue',
+    data: { solde: solde },
+    success: function(response) {
+        // Gérer la réponse de la vue
+    },
+    error: function(xhr, status, error) {
+        // Gérer les erreurs
+    }
+});
 </script>
 @endsection
