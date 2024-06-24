@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container py-3">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="my-3" title="Ajouter un agent">
+            {{-- <div class="my-3" title="Ajouter un agent">
                 <a href="/ajoute_user" class="btn btn-primary"> <i class="bi bi-plus"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header">List des Agents</div>
+            </div> --}}
+            <div class="card mt-5">
+                <div class="card-header"><h3>List des Agents</h3></div>
 
                 <div class="card-body">
                     <table class="table table-striped text-center">

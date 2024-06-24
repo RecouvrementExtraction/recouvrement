@@ -3,121 +3,120 @@
 <link rel="stylesheet" href="{{asset('Css/home.css')}}">
 <div class="mt-5 mx-5">
     <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">{{ __("Tableau d'affichage") }}</div>
-                <div class="card-body">
-                    <form id="searchForm" class="mb-3">
-                        <div class="form-group">
-                            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
-                        </div>
-                        <button type="submit" class="btn btn-primary retour-bouton">Rechercher</button>
-                    </form>
-                    @if(count($data) > 0)
-                    <table class="table table-bordered" id="myTable" >
-                        <thead class=" text-cente">
-                            <tr>
-                                <th>Nom</th>
-                                <th>Téléphone</th>
-                                <th>Email</th>
-                                <th>Ligne</th>
-                                <th>Libellé</th>
-                                {{-- <th>N° Facture</th> --}}
-                                <th class="col-1">Action</th>
-                                <th>Solde</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $currentCTNum = null;
-                                $totalDebit = 0;
-                                $totalCredit = 0;
-                                $currentSolde = 0;
-                            @endphp
+        <hr><hr>
+        {{-- <h1>Soldes par Client</h1> --}}
+        {{-- @foreach ($soldesParClient as $CT_Num => $client)
+        @if ($client['total'] != 0)
+            <h2>Client {{ $CT_Num }} - {{ $client['CT_Intitule'] }}</h2>
+            <p><strong>Téléphone:</strong> {{ $client['CT_Telephone'] }}</p>
+            <p><strong>Email:</strong> {{ $client['CT_EMail'] }}</p>
+            <p><strong>Nom Collaborateur:</strong> {{ $client['CO_Nom'] }}</p>
 
-                            @foreach($data as $item)
-                                @if($currentCTNum !== $item->CT_Num)
-                                    {{-- Fermer la ligne précédente avant d'ouvrir une nouvelle --}}
-                                    @if($currentCTNum !== null)
-                                        <td>{{ $totalDebit - $totalCredit }}</td>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>EC_Intitule</th>
+                        <th>Ec_Montant</th>
+                        <th>EC_Lettre</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $prevIntitule = null; @endphp
+                    @foreach ($client['details'] as $detail)
+                        @if ($prevIntitule !== $detail['EC_Intitule'])
+                            <tr>
+                                <td>{{ $detail['EC_Intitule'] }}</td>
+                                <td>{{ $detail['Ec_Montant'] }}</td>
+                                <td>{{ $detail['EC_Lettre'] }}</td>
+                                <td>
+                                    <a href="/details/{{$CT_Num}}" class="btn btn-primary">Voir les factures</a>
+                                </td>
+                            </tr>
+                            @php $prevIntitule = $detail['EC_Intitule']; @endphp
+                        @endif
+                    @endforeach
+                </tbody>
+            </table>
+
+            <p><strong>Total Débit:</strong> {{ $client['totalDebit'] }}</p>
+            <p><strong>Total Crédit:</strong> {{ $client['totalCredit'] }}</p>
+            <p><strong>Solde Courant:</strong> {{ $client['total'] }}</p>
+
+            <hr>
+        @endif
+        @endforeach --}}
+
+        <div class="mt-5 mx-5">
+            <div class="row justify-content-center">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">{{ __("Tableau") }}</div>
+                        <div class="card-body">
+                            <form id="searchForm" class="mb-3">
+                                <div class="form-group">
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
+                                </div>
+                                <button type="submit" class="btn btn-primary retour-bouton">Rechercher</button>
+                            </form>
+
+                            @if(count($soldesParClient) > 0)
+                                <table class="table table-bordered text-center" id="myTable">
+                                    <thead>
+                                        <tr class="text-center">
+                                            <th class="col-2">N°</th>
+                                            <th class="col-2">Nom</th>
+                                            <th class="col-2">Téléphone</th>
+                                            <th class="col-2">Email</th>
+                                            <th class="col-2">Ligne</th>
+                                            <th class="col-1">Action</th>
+                                            <th class="col-2">Solde</th>
                                         </tr>
-                                    @endif
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($soldesParClient as $CT_Num => $client)
+                                            @if ($client['total'] != 0)
+                                                @php $firstRow = true; @endphp
+                                                @foreach ($client['details'] as $detail)
+                                                    @if ($firstRow)
+                                                        <tr>
+                                                            <td rowspan="{{ count($client['details']) }}">{{ $CT_Num }}</td>
+                                                            <td rowspan="{{ count($client['details']) }}">{{ $client['CT_Intitule'] }}</td>
+                                                            <td rowspan="{{ count($client['details']) }}">{{ $client['CT_Telephone'] }}</td>
+                                                            <td rowspan="{{ count($client['details']) }}">{{ $client['CT_EMail'] }}</td>
+                                                            <td rowspan="{{ count($client['details']) }}">{{ $client['CO_Nom'] }}</td>
+                                                            {{-- <td>{{ $detail['EC_Intitule'] }}</td> --}}
+                                                            <td rowspan="{{ count($client['details']) }}">
+                                                                <a href="/details/{{ $CT_Num }}" class="btn btn-primary" title="voir les factures"><i class="bi bi-eye"></i></a>
+                                                            </td>
+                                                            <td rowspan="{{ count($client['details']) }}">{{ $client['total'] }}</td>
+                                                        </tr>
+                                                        @php $firstRow = false; @endphp
 
-                                    {{-- Ouvrir une nouvelle ligne --}}
-                                    <tr>
-                                        <td>{{ $item->CT_Intitule }}</td>
-                                        <td>{{ $item->CT_Telephone }}</td>
-                                        {{-- <td>{{ $item->CT_EMail }}</td> --}}
-                                        <td>{{ !empty($item->CT_EMail) ? $item->CT_EMail : 'emailClient@gmail.com' }}</td>
-                                        <td>{{ $item->CO_Nom }}</td>
-                                        <td>{{ $item->EC_Intitule }}</td>
-                                        {{-- <td>{{ $item->EC_RefPiece }}</td> --}}
+                                                    @endif
+                                                @endforeach
+                                                {{-- <tr>
+                                                    <td colspan="7">
+                                                        <p><strong>Total Débit:</strong> {{ $client['totalDebit'] }}</p>
+                                                        <p><strong>Total Crédit:</strong> {{ $client['totalCredit'] }}</p>
+                                                        <p><strong>Solde Courant:</strong> {{ $client['total'] }}</p>
+                                                    </td>
+                                                </tr> --}}
+                                            @endif
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <p>Aucune donnée disponible.</p>
+                            @endif
 
-                                        <td>
-                                            <a href="/details/{{$item->CT_Num}}" class="btn btn-primary" >voir les factures</a>
-                                        </td>
-
-                                        @php
-                                            // Réinitialise les totaux pour la nouvelle facture
-                                            $totalDebit = 0;
-                                            $totalCredit = 0;
-                                            $currentSolde = 0;
-                                            $currentCTNum = $item->CT_Num;
-
-                                            // Vérifie le EC_sens pour déterminer le débit ou le crédit
-                                            if ($item->EC_sens > 0) {
-                                                $totalCredit += $item->Ec_Montant;
-                                            } else {
-                                                $totalDebit += $item->Ec_Montant;
-                                            }
-                                            $currentSolde += $item->Ec_Montant;
-                                        @endphp
-                                @else
-                                    @php
-                                        // Vérifie le EC_sens pour déterminer le débit ou le crédit
-                                        if ($item->EC_sens > 0) {
-                                            $totalCredit += $item->Ec_Montant;
-                                        } else {
-                                            $totalDebit += $item->Ec_Montant;
-                                        }
-                                        $currentSolde += $item->Ec_Montant;
-                                    @endphp
-                                @endif
-                            @endforeach
-
-                            {{-- Fermer la dernière ligne --}}
-                            <td>{{ $totalDebit - $totalCredit }}</td>
-                            {{-- <td> {{ number_format($solde, 0, ' ', ' ') }}</td> --}}
-                            </tr>
-                        </tbody>
-                    </table>
-                    @else
-                    <p>Aucune donnée disponible.</p>
-                    @endif
+                        </div>
+                    </div>
                 </div>
-                <h1>Recouvrements par Client</h1>
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>ID Client</th>
-                            <th>Total Crédit</th>
-                            <th>Total Débit</th>
-                            <th>Solde</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($recouvrements as $recouvrement)
-                            <tr>
-                                <td>{{ $recouvrement->idClient }}</td>
-                                <td>{{ $recouvrement->total_credit }}</td>
-                                <td>{{ $recouvrement->total_debit }}</td>
-                                <td>{{ $recouvrement->solde }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
             </div>
         </div>
+
+
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

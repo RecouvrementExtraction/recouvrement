@@ -149,10 +149,10 @@
                                     <form id="form_{{ $donnee->CT_Num }}" action="{{ route('enregistrer_commentaire') }}" method="post" class="mx-5">
                                         @csrf
                                         <div class="input-group date">
-                                            <input type="text" class="form-control datepicker datepicker_{{ $donnee->CT_Num }}" readonly>
+                                            <input type="text" id="input_{{ $donnee->CT_Num }}" class="form-control datepicker datepicker_{{ $donnee->CT_Num }}" readonly>
                                             <div class="input-group-append">
                                                 <button class="btn btn-warning dateBtn datepicker datepicker_{{ $donnee->CT_Num }}" type="button"><i class="bi bi-calendar"></i></button>
-                                                <button id="submitBtn_{{ $donnee->CT_Num}}" type="button" class="btn btn-primary submitBtn btn-sm" data-date-field="date_{{ $donnee->CT_Num }}" ><i class="bi bi-send"></i></button>
+                                                <button id="submitBtn_{{ $donnee->CT_Num }}" type="button" class="btn btn-primary submitBtn btn-sm" data-date-field="date_{{ $donnee->CT_Num }}" disabled><i class="bi bi-send"></i></button>
                                             </div>
                                         </div>
                                         <input type="hidden" name="id_agent" value="{{ auth()->user()->id }}">
@@ -166,6 +166,7 @@
                                         <input type="hidden" name="credit" value="{{ $totalCredit }}">
                                         <input type="hidden" id="date_{{ $donnee->CT_Num }}" name="message" value="Monace">
                                     </form>
+
                                 </td>
                             </tr>
                         @endif
@@ -228,6 +229,23 @@
             }
         });
     }
+
+    //Desactiver le bouton d'envoi
+    $(document).ready(function() {
+    // Attache l'événement keyup à chaque input
+    $('input[type="text"]').on('keyup change', function() {
+        let formId = $(this).attr('id').split('_')[1];  // Extraire le CT_Num de l'id
+        let inputVal = $(this).val();  // Valeur de l'input
+        let submitBtn = $('#submitBtn_' + formId);  // Bouton de soumission correspondant
+
+        // Activer ou désactiver le bouton de soumission
+        if (inputVal.trim() !== "") {
+            submitBtn.prop('disabled', false);
+        } else {
+            submitBtn.prop('disabled', true);
+        }
+    });
+});
 
 
     $(document).ready(function(){

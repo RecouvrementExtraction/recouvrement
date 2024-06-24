@@ -46,43 +46,96 @@ class HomeController extends Controller
 
             // Utiliser $userId dans la requête
             $row = DB::table('recouvrements')->select('idClient','credit','debit');
-            $data = DB::table('F_ECRITUREC')
-                ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
-                ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')
-                ->join('portefeuilles', 'F_COLLABORATEUR.CO_Nom', '=', 'portefeuilles.name')
-                ->join('portefeuille_user', 'portefeuilles.id', '=', 'portefeuille_user.portefeuille_id')
-                ->join('users', 'portefeuille_user.user_id', '=', 'users.id')
-                ->select(
-                    'F_COMPTET.CO_No',
-                    'F_COMPTET.CT_Intitule',
-                    'F_COMPTET.CT_Telephone',
-                    'F_COMPTET.CT_EMail',
-                    'F_COLLABORATEUR.CO_Nom',
-                    'F_ECRITUREC.CT_Num',
-                    'F_ECRITUREC.EC_Intitule',
-                    'F_ECRITUREC.EC_sens',
-                    'F_ECRITUREC.Ec_Montant',
-                    'F_ECRITUREC.EC_Echeance',
-                    'F_ECRITUREC.EC_RefPiece',
-                    'F_ECRITUREC.EC_Lettre'
-                )
-                ->where('F_ECRITUREC.EC_Lettre', '=', 0)
-                ->where('F_ECRITUREC.CT_Num', 'like', 'CL%')
-                ->where('users.id', '=', $userId)
-                ->when($query, function ($q) use ($query) {
-                    return $q->where(function ($queryBuilder) use ($query) {
-                        $queryBuilder->where('F_COMPTET.CT_Intitule', 'like', "%$query%")
-                            ->orWhere('F_COMPTET.CT_Telephone', 'like', "%$query%")
-                            ->orWhere('F_COMPTET.CT_EMail', 'like', "%$query%")
-                            ->orWhere('F_COLLABORATEUR.CO_Nom', 'like', "%$query%")
-                            ->orWhere('F_ECRITUREC.EC_Intitule', 'like', "%$query%");
-                    });
-                })
-                ->orderBy('F_ECRITUREC.CT_Num')
-                ->paginate(10); // Pagination à 10 éléments par page
 
-                 // Calculer le solde total
-    $solde = $this->calculerSolde($data);
+            $data = DB::table('F_ECRITUREC')
+            ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
+            ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')
+            ->join('portefeuilles', 'F_COLLABORATEUR.CO_Nom', '=', 'portefeuilles.name')
+            ->join('portefeuille_user', 'portefeuilles.id', '=', 'portefeuille_user.portefeuille_id')
+            ->join('users', 'portefeuille_user.user_id', '=', 'users.id')
+            ->select(
+                'F_COMPTET.CO_No',
+                'F_COMPTET.CT_Intitule',
+                'F_COMPTET.CT_Telephone',
+                'F_COMPTET.CT_EMail',
+                'F_COLLABORATEUR.CO_Nom',
+                'F_ECRITUREC.CT_Num',
+                'F_ECRITUREC.EC_Intitule',
+                'F_ECRITUREC.EC_sens',
+                'F_ECRITUREC.Ec_Montant',
+                'F_ECRITUREC.EC_Echeance',
+                'F_ECRITUREC.EC_RefPiece',
+                'F_ECRITUREC.EC_Lettre'
+            )
+            ->where('F_ECRITUREC.EC_Lettre', '=', 0)
+            ->where('F_ECRITUREC.CT_Num', 'like', 'CL%')
+            ->where('users.id', '=', $userId)
+            ->when($query, function ($q) use ($query) {
+                return $q->where(function ($queryBuilder) use ($query) {
+                    $queryBuilder->where('F_COMPTET.CT_Intitule', 'like', "%$query%")
+                        ->orWhere('F_COMPTET.CT_Telephone', 'like', "%$query%")
+                        ->orWhere('F_COMPTET.CT_EMail', 'like', "%$query%")
+                        ->orWhere('F_COLLABORATEUR.CO_Nom', 'like', "%$query%")
+                        ->orWhere('F_ECRITUREC.EC_Intitule', 'like', "%$query%");
+                });
+            })
+            ->orderBy('F_ECRITUREC.CT_Num')
+            ->get();
+
+        $soldesParClient = [];
+
+        foreach ($data as $item) {
+            $CT_Num = $item->CT_Num;
+
+            if (!isset($soldesParClient[$CT_Num])) {
+                $soldesParClient[$CT_Num] = [
+                    'CT_Intitule' => $item->CT_Intitule,
+                    'CT_Telephone' => $item->CT_Telephone,
+                    'CT_EMail' => $item->CT_EMail,
+                    'CO_Nom' => $item->CO_Nom,
+                    'details' => [],
+                    'totalDebit' => 0,
+                    'totalCredit' => 0,
+                    'total' => 0,
+                ];
+            }
+
+            // Vérifie le EC_sens pour déterminer le débit ou le crédit
+            if ($item->EC_sens > 0) {
+                $soldesParClient[$CT_Num]['totalCredit'] += $item->Ec_Montant;
+            } else {
+                $soldesParClient[$CT_Num]['totalDebit'] += $item->Ec_Montant;
+            }
+
+            // Ajouter le détail de la facture
+            $found = false;
+            foreach ($soldesParClient[$CT_Num]['details'] as &$detail) {
+                if ($detail['EC_Intitule'] === $item->EC_Intitule) {
+                    $detail['Ec_Montant'] += $item->Ec_Montant;
+                    $found = true;
+                    break;
+                }
+            }
+            unset($detail); // Dissocier la référence pour éviter les effets indésirables
+
+            if (!$found) {
+                $soldesParClient[$CT_Num]['details'][] = [
+                    'EC_Intitule' => $item->EC_Intitule,
+                    'Ec_Montant' => $item->Ec_Montant,
+                    'EC_Lettre' => $item->EC_Lettre,
+                    // Ajoutez d'autres champs nécessaires ici
+                ];
+            }
+
+            // Calculer le total
+            $soldesParClient[$CT_Num]['total'] = $soldesParClient[$CT_Num]['totalCredit'] - $soldesParClient[$CT_Num]['totalDebit'];
+        }
+
+        // Pagination si nécessaire
+        // $soldesParClient = paginate($soldesParClient, 10); // Exemple de pagination
+    // dd($soldesParClient);
+
+
 
 
     $recouvrements = DB::table('recouvrements')
@@ -93,19 +146,29 @@ class HomeController extends Controller
     ->groupBy('idClient')
     ->get();
 
+    // Supposons que $soldesParClient a déjà été rempli avec les détails des clients
 
-    $recouvrementSolde = [];
+        foreach ($soldesParClient as $CT_Num => &$client) {
+            // Chercher la correspondance dans $recouvrements pour mettre à jour le solde
+            foreach ($recouvrements as $recouvrement) {
+                if ($recouvrement->idClient == $CT_Num) {
+                    // Mettre à jour le solde courant avec le solde de la nouvelle requête
+                    $client['total'] -= $recouvrement->solde;
+                    break; // Sortir de la boucle dès qu'on a trouvé la correspondance
+                }
+            }
+        }
 
-    // Exemple : bouclez à travers $recouvrements pour obtenir les soldes par CT_Num
-    foreach ($recouvrements as $recouvrement) {
-        $recouvrementSolde[$recouvrement->idClient] = $recouvrement->solde;
-    }
-    return view('home', compact('data', 'solde','recouvrements', 'recouvrementSolde'));
+
+    return view('home', compact('data','recouvrements','soldesParClient'));
 
         } else {
             return redirect()->back();
         }
     }
+
+
+
 
 
     private function calculerSolde($data)

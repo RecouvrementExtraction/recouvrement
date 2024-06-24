@@ -1,0 +1,155 @@
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">{{ __("Tableau d'affichage") }}</div>
+        <div class="card-body">
+            <form id="searchForm" class="mb-3">
+                <div class="form-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
+                </div>
+                <button type="submit" class="btn btn-primary retour-bouton">Rechercher</button>
+            </form>
+            @if(count($data) > 0)
+            <table class="table table-bordered" id="myTable" >
+                <thead class=" text-cente">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Téléphone</th>
+                        <th>Email</th>
+                        <th>Ligne</th>
+                        <th>Libellé</th>
+                        {{-- <th>N° Facture</th> --}}
+                        <th class="col-1">Action</th>
+                        <th>Solde</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $currentCTNum = null;
+                        $totalDebit = 0;
+                        $totalCredit = 0;
+                        $currentSolde = 0;
+                    @endphp
+
+                    @foreach($data as $item)
+                        @if($currentCTNum !== $item->CT_Num)
+                            {{-- Fermer la ligne précédente avant d'ouvrir une nouvelle --}}
+                            {{-- Ouvrir une nouvelle ligne --}}
+                            <tr>
+                                <td>{{ $item->CT_Intitule }}</td>
+                                <td>{{ $item->CT_Telephone }}</td>
+                                {{-- <td>{{ $item->CT_EMail }}</td> --}}
+                                <td>{{ !empty($item->CT_EMail) ? $item->CT_EMail : 'emailClient@gmail.com' }}</td>
+                                <td>{{ $item->CO_Nom }}</td>
+                                <td>{{ $item->EC_Intitule }}</td>
+                                {{-- <td>{{ $item->EC_RefPiece }}</td> --}}
+
+                                <td>
+                                    <a href="/details/{{$item->CT_Num}}" class="btn btn-primary" >voir les factures</a>
+                                </td>
+
+                                @php
+                                    // Réinitialise les totaux pour la nouvelle facture
+                                    $totalDebit = 0;
+                                    $totalCredit = 0;
+                                    $currentSolde = 0;
+                                    $currentCTNum = $item->CT_Num;
+
+                                    // Vérifie le EC_sens pour déterminer le débit ou le crédit
+                                    if ($item->EC_sens > 0) {
+                                        $totalCredit += $item->Ec_Montant;
+                                    } else {
+                                        $totalDebit += $item->Ec_Montant;
+                                    }
+                                    $currentSolde += $item->Ec_Montant;
+                                @endphp
+                        @else
+                            @php
+                                // Vérifie le EC_sens pour déterminer le débit ou le crédit
+                                if ($item->EC_sens > 0) {
+                                    $totalCredit += $item->Ec_Montant;
+                                } else {
+                                    $totalDebit += $item->Ec_Montant;
+                                }
+                                $currentSolde += $item->Ec_Montant;
+                            @endphp
+                        @endif
+                    @endforeach
+
+                    {{-- Fermer la dernière ligne --}}
+                    {{-- <td>{{ $total }}</td> --}}
+                    <td>{{ $totalDebit - $totalCredit }}</td>
+                    {{-- <td> {{ number_format($solde, 0, ' ', ' ') }}</td> --}}
+                    </tr>
+                </tbody>
+            </table>
+            @else
+            <p>Aucune donnée disponible.</p>
+            @endif
+        </div>
+        <h1>Recouvrements par Client</h1>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID Client</th>
+                    <th>Total Crédit</th>
+                    <th>Total Débit</th>
+                    <th>Solde</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($recouvrements as $recouvrement)
+                    <tr>
+                        <td>{{ $recouvrement->idClient }}</td>
+                        <td>{{ $recouvrement->total_credit }}</td>
+                        <td>{{ $recouvrement->total_debit }}</td>
+                        <td>{{ $recouvrement->solde}}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        {{-- <h1>Détails des Écritures</h1>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Total Débit</th>
+                    <th>Total Crédit</th>
+                    <th>Solde Courant</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ $totalDebit }}</td>
+                    <td>{{ $totalCredit }}</td>
+                    <td>{{ $total }}</td>
+                </tr>
+            </tbody>
+        </table> --}}
+    </div>
+</div>
+
+
+
+
+
+
+<h1>Recouvrements par Client</h1>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>ID Client</th>
+                            <th>Total Crédit</th>
+                            <th>Total Débit</th>
+                            <th>Solde</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($recouvrements as $recouvrement)
+                            <tr>
+                                <td>{{ $recouvrement->idClient }}</td>
+                                <td>{{ $recouvrement->total_credit }}</td>
+                                <td>{{ $recouvrement->total_debit }}</td>
+                                <td>{{ $recouvrement->solde }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
