@@ -30,6 +30,7 @@ Route::get('/tableau',[MonController::class, 'montrer'])->name('tableau');
 Route::get('/faux',[MonController::class, 'faux'])->name('faux');
 
 Route::get('/details/{CT_Num}', [MonController::class, 'details']);
+Route::get('/facturesClient/{CT_Num}', [MonController::class, 'facturesClient']);
 
 
 Route::get('/time', [FauxController::class, 'time']);

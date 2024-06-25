@@ -85,11 +85,11 @@
                                                             <td rowspan="{{ count($client['details']) }}">{{ $client['CT_Telephone'] }}</td>
                                                             <td rowspan="{{ count($client['details']) }}">{{ $client['CT_EMail'] }}</td>
                                                             <td rowspan="{{ count($client['details']) }}">{{ $client['CO_Nom'] }}</td>
-                                                            {{-- <td>{{ $detail['EC_Intitule'] }}</td> --}}
                                                             <td rowspan="{{ count($client['details']) }}">
                                                                 <a href="/details/{{ $CT_Num }}" class="btn btn-primary" title="voir les factures"><i class="bi bi-eye"></i></a>
+                                                                <a href="/facturesClient/{{ $CT_Num }}" class="btn btn-primary" title="voir les factures"><i class="bi-back"></i></a>
                                                             </td>
-                                                            <td rowspan="{{ count($client['details']) }}">{{ $client['total'] }}</td>
+                                                            <td rowspan="{{ count($client['details']) }}">{{ abs($client['total']) }}</td>
                                                         </tr>
                                                         @php $firstRow = false; @endphp
 
@@ -112,6 +112,27 @@
 
                         </div>
                     </div>
+                    <h1>Recouvrements par Client</h1>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>ID Client</th>
+                            <th>Total Crédit</th>
+                            <th>Total Débit</th>
+                            <th>Solde</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($recouvrements as $recouvrement)
+                            <tr>
+                                <td>{{ $recouvrement->idClient }}</td>
+                                <td>{{ $recouvrement->total_credit }}</td>
+                                <td>{{ $recouvrement->total_debit }}</td>
+                                <td>{{ $recouvrement->solde }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
                 </div>
             </div>
         </div>

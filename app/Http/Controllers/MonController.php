@@ -52,6 +52,7 @@ class MonController extends Controller
         $query = $request->input('search');
         $data = DB::table('F_ECRITUREC')
             ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
+            ->join('F_JOURNAUX', 'F_ECRITUREC.JO_Num', '=', 'F_JOURNAUX.JO_Num')
             ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')
             ->join('portefeuilles', 'F_COLLABORATEUR.CO_Nom', '=', 'portefeuilles.name')
             ->join('portefeuille_user', 'portefeuilles.id', '=', 'portefeuille_user.portefeuille_id')
@@ -68,10 +69,12 @@ class MonController extends Controller
                 'F_ECRITUREC.Ec_Montant',
                 'F_ECRITUREC.EC_Echeance',
                 'F_ECRITUREC.EC_RefPiece',
-                'F_ECRITUREC.EC_Lettre'
+                'F_ECRITUREC.EC_Lettre',
+                'F_JOURNAUX.JO_Type'
             )
             ->where('F_ECRITUREC.CT_Num', '=', $CT_Num)
             ->where('F_ECRITUREC.EC_Lettre', '=', 0)
+            ->where('F_JOURNAUX.JO_Type', '=', 1)
             ->where('F_ECRITUREC.CT_Num', 'like', 'CL%')
             ->when($query, function ($q) use ($query) {
                 return $q->where(function ($queryBuilder) use ($query) {
@@ -92,12 +95,59 @@ class MonController extends Controller
     }
 
 
-    private function calculerSolde($data)
+
+
+
+
+    public function facturesClient(Request $request, $CT_Num)
+    {
+        $query = $request->input('search');
+        $data = DB::table('F_ECRITUREC')
+            ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
+            ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')
+            ->join('portefeuilles', 'F_COLLABORATEUR.CO_Nom', '=', 'portefeuilles.name')
+            ->join('portefeuille_user', 'portefeuilles.id', '=', 'portefeuille_user.portefeuille_id')
+            ->join('users', 'portefeuille_user.user_id', '=', 'users.id')
+            ->select(
+                'F_COMPTET.CO_No',
+                'F_COMPTET.CT_Intitule',
+                'F_COMPTET.CT_Telephone',
+                'F_COMPTET.CT_EMail',
+                'F_COLLABORATEUR.CO_Nom',
+                'F_ECRITUREC.CT_Num',
+                'F_ECRITUREC.EC_Intitule',
+                'F_ECRITUREC.EC_sens',
+                'F_ECRITUREC.Ec_Montant',
+                'F_ECRITUREC.EC_Echeance',
+                'F_ECRITUREC.EC_RefPiece',
+                'F_ECRITUREC.EC_Lettre',
+            )
+            ->where('F_ECRITUREC.CT_Num', '=', $CT_Num)
+            ->where('F_ECRITUREC.EC_Lettre', '=', 0)
+            ->where('F_ECRITUREC.CT_Num', 'like', 'CL%')
+            ->when($query, function ($q) use ($query) {
+                return $q->where(function ($queryBuilder) use ($query) {
+                    $queryBuilder->where('F_COMPTET.CT_Intitule', 'like', "%$query%")
+                        ->orWhere('F_COMPTET.CT_Telephone', 'like', "%$query%")
+                        ->orWhere('F_COMPTET.CT_EMail', 'like', "%$query%")
+                        ->orWhere('F_COLLABORATEUR.CO_Nom', 'like', "%$query%")
+                        ->orWhere('F_ECRITUREC.EC_Intitule', 'like', "%$query%");
+                });
+            })
+            ->paginate(10);
+
+            return view('facturesClient', compact('data','CT_Num'));
+
+    }
+
+
+
+    private function calculerSolde($var)
     {
         $solde = 0;
 
         // Parcourir les données pour calculer le solde
-        foreach ($data as $item) {
+        foreach ($var as $item) {
             if ($item->EC_sens > 0) {
                 // Si EC_sens est positif, c'est un crédit
                 $solde += $item->Ec_Montant;
@@ -110,6 +160,18 @@ class MonController extends Controller
         return $solde;
     }
 
+     // Supposons que $soldesParClient a déjà été rempli avec les détails des clients
+
+                // foreach ($soldesParClient as $CT_Num => &$client) {
+                //     // Chercher la correspondance dans $recouvrements pour mettre à jour le solde
+                //     foreach ($recouvrements as $recouvrement) {
+                //         if ($recouvrement->idClient == $CT_Num) {
+                //             // Mettre à jour le solde courant avec le solde de la nouvelle requête
+                //             $client['total'] -= $recouvrement->solde;
+                //             break; // Sortir de la boucle dès qu'on a trouvé la correspondance
+                //         }
+                //     }
+                // }
 
 
     public function fusion()
