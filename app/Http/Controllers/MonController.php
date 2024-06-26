@@ -273,9 +273,6 @@ class MonController extends Controller
         $credit = $request->input('credit');
         $debit = $request->input('debit');
 
-
-
-
         DB::table('commentaires')->insert([
             'ligne' => $ligne,
             'idClient' => $idClient,
@@ -358,5 +355,30 @@ class MonController extends Controller
     }
 
 
+
+    public function viens(Request $request){
+        $id_agent = $request->input('id_agent');
+        $idClient = $request->input('idClient');
+        $ligne = $request->input('ligne');
+        $email = $request->input('email');
+        $num_facture = $request->input('num_facture');
+        $libelle = $request->input('libelle');
+        $telephone = $request->input('telephone');
+        $credit = $request->input('credit');
+        $debit = $request->input('debit');
+
+        // Utilisation de dd() pour afficher les valeurs
+        dd([
+            'id_agent' => $id_agent,
+            'idClient' => $idClient,
+            'ligne' => $ligne,
+            'email' => $email,
+            'num_facture' => $num_facture,
+            'libelle' => $libelle,
+            'telephone' => $telephone,
+            'credit' => $credit,
+            'debit' => $debit,
+        ]);
+    }
 }
 

@@ -1,43 +1,34 @@
 document.addEventListener('DOMContentLoaded', function() {
     var dateTirageElement = document.getElementById('dateTirage');
-    var currentDate = new Date();
-    var formattedDate = currentDate.toLocaleDateString('fr-FR'); // Format de date français
+    if (dateTirageElement) {
+        var currentDate = new Date();
+        var formattedDate = currentDate.toLocaleDateString('fr-FR'); // Format de date français
+        dateTirageElement.textContent += formattedDate;
+    }
 
-    dateTirageElement.textContent += formattedDate;
+    const presentAlertButton = document.getElementById('present-alert');
+    if (presentAlertButton) {
+        presentAlertButton.addEventListener('click', function() {
+            prompt('Message du client...');
+        });
+    }
 });
 
 function imprimerPage() {
-    // Déclencher la fenêtre d'impression
     window.print();
 }
 
+function retourPagePrecedente() {
+    window.history.back();
+}
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    const presentAlertButton = document.getElementById('present-alert');
-
-    presentAlertButton.addEventListener('click', function() {
-        const name = prompt('Message du client...');
-});
-});
-
-
-
-    // Fonction pour retourner à la page précédente en actualisant
-    function retourPagePrecedente() {
-        window.history.back();
-    }
-
-
-    $(document).ready(function() {
-        $('#searchInput').on('input', function() {
-            var searchText = $(this).val().toLowerCase(); // Récupérer le texte saisi dans le champ de recherche
-            filterTable(searchText); // Appeler la fonction pour filtrer le tableau en fonction du texte saisi
-        });
+$(document).ready(function() {
+    $('#searchInput').on('input', function() {
+        var searchText = $(this).val().toLowerCase(); // Récupérer le texte saisi dans le champ de recherche
+        filterTable(searchText); // Appeler la fonction pour filtrer le tableau en fonction du texte saisi
     });
 
     function filterTable(searchText) {
-        // Parcourir chaque ligne du tableau
         $('#myTable tbody tr').each(function() {
             var rowText = $(this).text().toLowerCase(); // Récupérer le texte de la ligne en minuscules
 
@@ -49,3 +40,61 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Désactiver le bouton d'envoi
+    $('input[type="text"]').on('keyup change', function() {
+        let formId = $(this).attr('id').split('_')[1];  // Extraire le CT_Num de l'id
+        let inputVal = $(this).val();  // Valeur de l'input
+        let submitBtn = $('#submitBtn_' + formId);  // Bouton de soumission correspondant
+
+        // Activer ou désactiver le bouton de soumission
+        if (inputVal.trim() !== "") {
+            submitBtn.prop('disabled', false);
+        } else {
+            submitBtn.prop('disabled', true);
+        }
+    });
+
+    // Initialisation du datepicker
+    $('.datepicker').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $('.dateBtn').on('click', function() {
+        var index = $(this).attr('id').split('_')[1];
+        $('.datepicker_' + index).datepicker('show');
+    });
+
+    $('.datepicker').on('changeDate', function() {
+        var index = $(this).attr('class').split(' ')[2].split('_')[1];
+        var date = $(this).val();
+        $('#date_' + index).val(date); // Mettre à jour la valeur du champ caché avec la date sélectionnée
+    });
+
+    $('.submitBtn').on('click', function() {
+        var index = $(this).attr('id').split('_')[1];
+        var dateFieldId = $(this).data('date-field');
+        var date = $('#'+dateFieldId).val();
+        $('#'+dateFieldId).val(date); // Mettre à jour la valeur du champ de date caché
+        $('#form_' + index).submit();
+    });
+
+    // Récupération du solde depuis la page actuelle
+    var soldeText = $('.solde').text();
+    if (soldeText) {
+        var solde = parseFloat(soldeText.replace('Solde : ', '').replace(/\s/g, '').replace(',', '.')); // Conversion en nombre
+        $.ajax({
+            type: 'GET',
+            url: '/votre-autre-vue',
+            data: { solde: solde },
+            success: function(response) {
+                // Gérer la réponse de la vue
+            },
+            error: function(xhr, status, error) {
+                // Gérer les erreurs
+            }
+        });
+    }
+});

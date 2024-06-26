@@ -25,6 +25,9 @@ Route::get('ajoute_user', function(){
     return view('auth.register');
 });
 
+Route::post('/viens',[MonController::class, 'viens'])->name('viens');
+
+
 Route::get('/tableau',[MonController::class, 'montrer'])->name('tableau');
 
 Route::get('/faux',[MonController::class, 'faux'])->name('faux');

@@ -193,10 +193,10 @@
     <!-- Boutons d'impression et de navigation -->
     <div class="btn-group m-2">
         <button class="btn btn-success imprimer-bouton m-3" onclick="imprimerPage()" title="Imprimer la page"><i class="bi bi-printer"></i></button>
-        <a href="/client_recouvre/{{ auth()->user()->id }}" class="btn btn-warning imprimer-bouton m-3" title="Factures récouvrées"><i class="bi bi-people"></i></a>
-        <a href="/client_rappel/{{ auth()->user()->id }}" class="btn btn-info imprimer-bouton m-3" title="Clients à rappeler"><i class="bi bi-chat-dots"></i></a>
+        {{-- <a href="/client_recouvre/{{ auth()->user()->id }}" class="btn btn-warning imprimer-bouton m-3" title="Factures récouvrées"><i class="bi bi-people"></i></a>
+        <a href="/client_rappel/{{ auth()->user()->id }}" class="btn btn-info imprimer-bouton m-3" title="Clients à rappeler"><i class="bi bi-chat-dots"></i></a> --}}
     </div>
-    <div>Solde actuel : {{ $solde }}</div>
+    {{-- <div>Solde actuel : {{ $solde }}</div> --}}
 </div>
 
 <script src="{{ asset('Js/details.js') }}"></script>
@@ -209,86 +209,52 @@
         alert(errorMessage);
     }
 
-    $(document).ready(function() {
-        $('#searchInput').on('input', function() {
-            var searchText = $(this).val().toLowerCase(); // Récupérer le texte saisi dans le champ de recherche
-            filterTable(searchText); // Appeler la fonction pour filtrer le tableau en fonction du texte saisi
-        });
-    });
-
-    function filterTable(searchText) {
-        // Parcourir chaque ligne du tableau
-        $('#myTable tbody tr').each(function() {
-            var rowText = $(this).text().toLowerCase(); // Récupérer le texte de la ligne en minuscules
-
-            // Si le texte de la ligne contient le texte de recherche, afficher la ligne, sinon la cacher
-            if (rowText.includes(searchText)) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
-        });
-    }
-
     //Desactiver le bouton d'envoi
-    $(document).ready(function() {
-    // Attache l'événement keyup à chaque input
-    $('input[type="text"]').on('keyup change', function() {
-        let formId = $(this).attr('id').split('_')[1];  // Extraire le CT_Num de l'id
-        let inputVal = $(this).val();  // Valeur de l'input
-        let submitBtn = $('#submitBtn_' + formId);  // Bouton de soumission correspondant
+        $(document).ready(function() {
+            // Attache l'événement keyup à chaque input
+            $('input[type="text"]').on('keyup change', function() {
+                let formId = $(this).attr('id').split('_')[1];  // Extraire le CT_Num de l'id
+                let inputVal = $(this).val();  // Valeur de l'input
+                let submitBtn = $('#submitBtn_' + formId);  // Bouton de soumission correspondant
 
-        // Activer ou désactiver le bouton de soumission
-        if (inputVal.trim() !== "") {
-            submitBtn.prop('disabled', false);
-        } else {
-            submitBtn.prop('disabled', true);
-        }
-    });
-});
-
-
-    $(document).ready(function(){
-    $('.datepicker').datepicker({
-        format: 'dd/mm/yyyy',
-        autoclose: true,
-        todayHighlight: true
-    });
-
-    $('.dateBtn').on('click', function() {
-        var index = $(this).attr('id').split('_')[1];
-        $('.datepicker_' + index).datepicker('show');
-    });
-
-    $('.datepicker').on('changeDate', function() {
-        var index = $(this).attr('class').split(' ')[2].split('_')[1];
-        var date = $(this).val();
-        $('#date_' + index).val(date); // Mettre à jour la valeur du champ caché avec la date sélectionnée
-    });
-
-    $('.submitBtn').on('click', function() {
-        var index = $(this).attr('id').split('_')[1];
-        var dateFieldId = $(this).data('date-field');
-        var date = $('#'+dateFieldId).val();
-        $('#'+dateFieldId).val(date); // Mettre à jour la valeur du champ de date caché
-        $('#form_' + index).submit();
-    });
-});
+                // Activer ou désactiver le bouton de soumission
+                if (inputVal.trim() !== "") {
+                    submitBtn.prop('disabled', false);
+                } else {
+                    submitBtn.prop('disabled', true);
+                }
+            });
+        });
 
 
-// Récupération du solde depuis la page actuelle
-var soldeText = document.querySelector('.solde').textContent;
-var solde = parseFloat(soldeText.replace('Solde : ', '').replace(/\s/g, '').replace(',', '.')); // Conversion en nombre
-$.ajax({
-    type: 'GET',
-    url: '/votre-autre-vue',
-    data: { solde: solde },
-    success: function(response) {
-        // Gérer la réponse de la vue
-    },
-    error: function(xhr, status, error) {
-        // Gérer les erreurs
-    }
-});
+            $(document).ready(function(){
+            $('.datepicker').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true
+            });
+
+            $('.dateBtn').on('click', function() {
+                var index = $(this).attr('id').split('_')[1];
+                $('.datepicker_' + index).datepicker('show');
+            });
+
+            $('.datepicker').on('changeDate', function() {
+                var index = $(this).attr('class').split(' ')[2].split('_')[1];
+                var date = $(this).val();
+                $('#date_' + index).val(date); // Mettre à jour la valeur du champ caché avec la date sélectionnée
+            });
+
+            $('.submitBtn').on('click', function() {
+                var index = $(this).attr('id').split('_')[1];
+                var dateFieldId = $(this).data('date-field');
+                var date = $('#'+dateFieldId).val();
+                $('#'+dateFieldId).val(date); // Mettre à jour la valeur du champ de date caché
+                $('#form_' + index).submit();
+            });
+        });
+
+
+
 </script>
 @endsection

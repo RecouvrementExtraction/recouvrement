@@ -3,7 +3,6 @@
 <link rel="stylesheet" href="{{asset('Css/home.css')}}">
 <div class="mt-5 mx-5">
     <div class="row justify-content-center">
-        <hr><hr>
         {{-- <h1>Soldes par Client</h1> --}}
         {{-- @foreach ($soldesParClient as $CT_Num => $client)
         @if ($client['total'] != 0)
@@ -51,13 +50,13 @@
             <div class="row justify-content-center">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-header">{{ __("Tableau") }}</div>
+                        <div class="card-header text-center">{{ __("Liste des clients") }}</div>
                         <div class="card-body">
                             <form id="searchForm" class="mb-3">
                                 <div class="form-group">
                                     <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
                                 </div>
-                                <button type="submit" class="btn btn-primary retour-bouton">Rechercher</button>
+
                             </form>
 
                             @if(count($soldesParClient) > 0)
@@ -112,7 +111,7 @@
 
                         </div>
                     </div>
-                    <h1>Recouvrements par Client</h1>
+                    {{-- <h1>Recouvrements par Client</h1>
                 <table border="1">
                     <thead>
                         <tr>
@@ -132,7 +131,7 @@
                             </tr>
                         @endforeach
                     </tbody>
-                </table>
+                </table> --}}
                 </div>
             </div>
         </div>
@@ -141,27 +140,5 @@
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('#searchInput').on('input', function() {
-        var searchText = $(this).val().toLowerCase(); // Récupérer le texte saisi dans le champ de recherche
-        filterTable(searchText); // Appeler la fonction pour filtrer le tableau en fonction du texte saisi
-    });
-});
-
-function filterTable(searchText) {
-    // Parcourir chaque ligne du tableau
-    $('#myTable tbody tr').each(function() {
-        var rowText = $(this).text().toLowerCase(); // Récupérer le texte de la ligne en minuscules
-
-        // Si le texte de la ligne contient le texte de recherche, afficher la ligne, sinon la cacher
-        if (rowText.includes(searchText)) {
-            $(this).show();
-        } else {
-            $(this).hide();
-        }
-    });
-}
-
-</script>
+<script src="{{ asset('Js/home.js') }}"></script>
 @endsection

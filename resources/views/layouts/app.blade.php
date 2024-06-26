@@ -21,48 +21,90 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
+    <style>
+        /* Style général pour les boutons de la navbar */
+        .navbar-nav .nav-link {
+            padding: 10px 20px;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 5px; /* Ajout de la bordure arrondie */
+        }
+
+        /* Style au survol pour les trois premiers boutons */
+        .navbar-nav .nav-item:nth-child(-n+3) .nav-link:hover {
+            background-color: #171f916c; /* Couleur de fond sur survol */
+            color: #020202; /* Couleur de texte sur survol */
+            border-radius: 5px; /* Ajout de la bordure arrondie */
+        }
+
+        /* Style personnalisé pour le bouton d'accueil */
+        .navbar-nav .nav-item:first-child .nav-link:hover {
+            background-color: #171f916c;
+            color: #050505;
+            border-radius: 5px; /* Ajout de la bordure arrondie */
+        }
+    </style>
+
+
+
 </head>
 <body>
     <div id="app" class="d-flex flex-column min-vh-100">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm imprimer-bouton fixed-top">
-            <div class="mr-auto">
+            <div>
                 <img src="/images/log.png" alt="Logo de l'entreprise" height="50" width="100">
             </div>
             <div class="container">
-                <a class="navbar-brand custom-register-link" href="{{ url('/home') }}">
-                    {{-- {{__('Accueil')}} --}}
+                {{-- <a class="navbar-brand custom-register-link" href="{{ url('/home') }}">
                     <i class="bi bi-house-door"></i>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
-                </button>
+                </button> --}}
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-                        <!-- Add left side navbar items here -->
-                    </ul>
+                    <!-- Use flexbox to evenly distribute space between items -->
+                    <ul class="navbar-nav me-auto d-flex justify-content-between w-100">
+                        <!-- Left Side Of Navbar -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('/home') }}">
+                                <i class="bi bi-house-door"></i> Accueil
+                            </a>
+                        </li>
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
+                        @auth
+                            <!-- New buttons visible only to authenticated users -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="/client_recouvre/{{ auth()->user()->id }}">
+                                    <i class="bi-cash-stack"></i>factures
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/client_rappel/{{ auth()->user()->id }}">
+                                    <i class="bi-chat-dots"></i> rappels
+                                </a>
+                            </li>
+                        @endauth
+
                         @guest
                             @if (Route::has('register'))
                                 <li class="nav-item">
-                                    <a href="{{ route('register') }}" class="navbar-brand custom-register-link">
+                                    <a href="{{ route('register') }}" class="nav-link custom-register-link">
                                         {{ __("S'enregistrer") }}
                                     </a>
                                 </li>
                             @endif
-                        @else
+                        @endguest
+
+                        @auth
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    <i class="bi-person"></i>
                                     {{ Auth::user()->name }}
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     @can('manage-users')
-                                        <a href="{{route('admin.users.index')}}" class="dropdown-item">List des utilisateurs</a>
+                                        <a href="{{route('admin.users.index')}}" class="dropdown-item">Liste des utilisateurs</a>
                                     @endcan
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
@@ -74,11 +116,13 @@
                                     </form>
                                 </div>
                             </li>
-                        @endguest
+                        @endauth
                     </ul>
                 </div>
             </div>
         </nav>
+
+
 
         <main class="flex-grow-1 mt-5"  style="padding-top: 70px;">
             @yield('content')

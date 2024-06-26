@@ -72,14 +72,14 @@ main {
 /* Liens dans le dropdown au survol */
 .dropdown-menu .dropdown-item:hover {
     background-color: #171f916c; /* Couleur de fond au survol */
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 /* Bouton de déconnexion */
 #navbarDropdown {
     color: #2b0ae7; /* Couleur du texte */
-    font-weight: bolder;
-    font-size: large;
+    /* font-weight: bolder; */
+    /* font-size: large; */
 }
 
 /* Bouton de déconnexion au survol */
