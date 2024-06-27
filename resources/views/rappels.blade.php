@@ -68,11 +68,10 @@
                             <td>{{ $donnee->message }}</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    {{-- <form id="deleteForm_{{ $donnee->id }}" action="{{ route('supprimer_ligne', $donnee->id) }}" method="POST" style="display: inline;">
+                                    <form id="deleteForm_{{ $donnee->id }}" action="{{ route('supprimer_ligne', $donnee->id) }}" method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm mx-1" title="supprimer"><i class="bi bi-trash"></i></button>
-                                    </form> --}}
+                                    </form>
                                     <form id="enregistrerForm_{{ $donnee->id }}" action="{{ route('enregistrer_ligne') }}" method="post" class="text-center">
                                         @csrf
                                         <input type="hidden" name="id_agent" value="{{ auth()->user()->id }}">
@@ -84,8 +83,8 @@
                                         <input type="hidden" name="libelle" value="{{ $donnee->libelle }}">
                                         <input type="hidden" name="debit" value="{{ $donnee->debit }}">
                                         <input type="hidden" name="credit" value="{{ $donnee->credit }}">
-                                        <button type="submit" class="btn btn-info btn-sm enregistrer-button">
-                                            <i class="bi bi-check-circle" title="Récouvrer"></i>
+                                        <button type="button" class="btn btn-info btn-sm" onclick="submitForms('{{ $donnee->id }}')">
+                                            <i class="bi bi-check-circle" title="Récouvrer et Supprimer"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -101,51 +100,37 @@
 </div>
  <script src="{{asset('Js/details.js')}}"></script>
  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const deleteButtons = document.querySelectorAll('.delete-button');
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                if (confirm("Voulez-vous vraiment supprimer cette facture ?")) {
-                    this.closest('form').submit();
-                }
-            });
+        document.addEventListener("DOMContentLoaded", function() {
+            const retourButton = document.getElementById('retourButton');
+            if (!retourButton.getAttribute('href')) {
+                retourButton.addEventListener('click', retourPagePrecedente);
+            }
         });
-    });
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const retourButton = document.getElementById('retourButton');
-        if (!retourButton.getAttribute('href')) {
-            retourButton.addEventListener('click', retourPagePrecedente);
-        }
-    });
 
 
 
 
-    $(document).ready(function() {
-        $('.enregistrer-button').click(function(event) {
-            event.preventDefault(); // Empêche le comportement par défaut du bouton
+        // function submitForms(id) {
+        //     const enregistrerForm = document.getElementById('enregistrerForm_' + id);
+        //     const deleteForm = document.getElementById('deleteForm_' + id);
 
-            var form = $(this).closest('form'); // Trouve le formulaire parent
-            var formId = form.attr('id'); // Obtient l'ID du formulaire
-            var ligneId = formId.split('_')[1]; // Obtient l'ID de la ligne à partir de l'ID du formulaire
-
-            // Soumettre le formulaire via Ajax
-            $.ajax({
-                url: form.attr('action'), // URL spécifiée dans l'attribut action du formulaire
-                method: form.attr('method'), // Méthode spécifiée dans l'attribut method du formulaire
-                data: form.serialize(), // Sérialise les données du formulaire
-                success: function(response) {
-                    // Supprimer la ligne du tableau après l'insertion réussie
-                    $('#ligne_' + ligneId).remove();
-                    alert('Enregistrement inséré avec succès.');
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    console.error('Erreur lors de l\'enregistrement:', errorThrown);
-                    alert('Erreur lors de l\'enregistrement.');
-                }
-            });
-        });
-    });
+        //     const formData = new FormData(enregistrerForm);
+        //     fetch(enregistrerForm.action, {
+        //         method: 'POST',
+        //         body: formData,
+        //         headers: {
+        //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        //         }
+        //     }).then(response => {
+        //         if (response.ok) {
+        //             alert('Récouvrement effectué')
+        //             deleteForm.submit();
+        //         } else {
+        //             alert('Erreur lors de l\'enregistrement.');
+        //         }
+        //     }).catch(error => {
+        //         alert('Erreur lors de l\'enregistrement : ' + error.message);
+        //     });
+        // }
  </script>
 @endsection

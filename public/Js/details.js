@@ -98,3 +98,30 @@ $(document).ready(function() {
         });
     }
 });
+
+
+
+// // Fonction pour soumettre deux formulaires consécutivement dans la page rappel
+
+function submitForms(id) {
+    const enregistrerForm = document.getElementById('enregistrerForm_' + id);
+    const deleteForm = document.getElementById('deleteForm_' + id);
+
+    const formData = new FormData(enregistrerForm);
+    fetch(enregistrerForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    }).then(response => {
+        if (response.ok) {
+            alert('Récouvrement effectué')
+            deleteForm.submit();
+        } else {
+            alert('Erreur lors de l\'enregistrement.');
+        }
+    }).catch(error => {
+        alert('Erreur lors de l\'enregistrement : ' + error.message);
+    });
+}

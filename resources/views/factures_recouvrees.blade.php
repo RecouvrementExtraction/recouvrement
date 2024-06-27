@@ -46,7 +46,7 @@
                                 <form action="/factures_recouvrees/{{$donnee->idClient}}" method="post" class="d-inline delete-form">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="btn btn-danger delete-button">Supprimer</button>
+                                    <button type="button" class="btn btn-danger delete-button"><i class="bi bi-trash"></i></button>
                                 </form>
                             </td>
                         </tr>
