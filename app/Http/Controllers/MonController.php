@@ -10,6 +10,7 @@ use App\Models\Portefeuille;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Recouvrement;
+use Auth;
 use PDF;
 
 class MonController extends Controller
@@ -50,6 +51,8 @@ class MonController extends Controller
     public function details(Request $request, $CT_Num)
     {
         $query = $request->input('search');
+
+        // Récupérer les données paginées
         $data = DB::table('F_ECRITUREC')
             ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
             ->join('F_JOURNAUX', 'F_ECRITUREC.JO_Num', '=', 'F_JOURNAUX.JO_Num')
@@ -57,6 +60,7 @@ class MonController extends Controller
             ->join('portefeuilles', 'F_COLLABORATEUR.CO_Nom', '=', 'portefeuilles.name')
             ->join('portefeuille_user', 'portefeuilles.id', '=', 'portefeuille_user.portefeuille_id')
             ->join('users', 'portefeuille_user.user_id', '=', 'users.id')
+            ->leftJoin('recouvrements', 'F_ECRITUREC.EC_RefPiece', '=', 'recouvrements.num_facture')
             ->select(
                 'F_COMPTET.CO_No',
                 'F_COMPTET.CT_Intitule',
@@ -76,6 +80,7 @@ class MonController extends Controller
             ->where('F_ECRITUREC.EC_Lettre', '=', 0)
             ->where('F_JOURNAUX.JO_Type', '=', 1)
             ->where('F_ECRITUREC.CT_Num', 'like', 'CL%')
+            ->whereNull('recouvrements.num_facture')
             ->when($query, function ($q) use ($query) {
                 return $q->where(function ($queryBuilder) use ($query) {
                     $queryBuilder->where('F_COMPTET.CT_Intitule', 'like', "%$query%")
@@ -85,14 +90,53 @@ class MonController extends Controller
                         ->orWhere('F_ECRITUREC.EC_Intitule', 'like', "%$query%");
                 });
             })
-            ->paginate(10); // Utilisation de paginate pour la pagination
+            ->orderBy('F_ECRITUREC.EC_RefPiece')
+            ->paginate(10);
 
-            $solde = $this->calculerSolde($data);
+        // Récupérer toutes les données pour le calcul du solde total
+        $allData = DB::table('F_ECRITUREC')
+            ->join('F_COMPTET', 'F_ECRITUREC.CT_Num', '=', 'F_COMPTET.CT_Num')
+            ->join('F_JOURNAUX', 'F_ECRITUREC.JO_Num', '=', 'F_JOURNAUX.JO_Num')
+            ->join('F_COLLABORATEUR', 'F_COMPTET.CO_No', '=', 'F_COLLABORATEUR.CO_No')
+            ->join('portefeuilles', 'F_COLLABORATEUR.CO_Nom', '=', 'portefeuilles.name')
+            ->join('portefeuille_user', 'portefeuilles.id', '=', 'portefeuille_user.portefeuille_id')
+            ->join('users', 'portefeuille_user.user_id', '=', 'users.id')
+            ->leftJoin('recouvrements', 'F_ECRITUREC.EC_RefPiece', '=', 'recouvrements.num_facture')
+            ->select(
+                'F_COMPTET.CO_No',
+                'F_COMPTET.CT_Intitule',
+                'F_COMPTET.CT_Telephone',
+                'F_COMPTET.CT_EMail',
+                'F_COLLABORATEUR.CO_Nom',
+                'F_ECRITUREC.CT_Num',
+                'F_ECRITUREC.EC_Intitule',
+                'F_ECRITUREC.EC_sens',
+                'F_ECRITUREC.Ec_Montant',
+                'F_ECRITUREC.EC_Echeance',
+                'F_ECRITUREC.EC_RefPiece',
+                'F_ECRITUREC.EC_Lettre',
+                'F_JOURNAUX.JO_Type'
+            )
+            ->where('F_ECRITUREC.CT_Num', '=', $CT_Num)
+            ->where('F_ECRITUREC.EC_Lettre', '=', 0)
+            ->where('F_JOURNAUX.JO_Type', '=', 1)
+            ->where('F_ECRITUREC.CT_Num', 'like', 'CL%')
+            ->whereNull('recouvrements.num_facture')
+            ->get();
 
-            // Passer les données et le solde à la vue
-            return view('details', compact('data', 'solde','CT_Num'));
-        // return view('details', compact('data', 'CT_Num'));
+        // Calculer le solde total
+        $totalSolde = 0;
+        foreach ($allData as $donnee) {
+            $debitValue = ($donnee->EC_sens <= 0) ? $donnee->Ec_Montant : 0;
+            $creditValue = ($donnee->EC_sens > 0) ? $donnee->Ec_Montant : 0;
+            $totalSolde += ($debitValue - $creditValue);
+        }
+
+        // Passer les données et le solde à la vue
+        return view('details', compact('data', 'totalSolde', 'CT_Num'));
     }
+
+
 
 
 
@@ -160,19 +204,6 @@ class MonController extends Controller
         return $solde;
     }
 
-     // Supposons que $soldesParClient a déjà été rempli avec les détails des clients
-
-                // foreach ($soldesParClient as $CT_Num => &$client) {
-                //     // Chercher la correspondance dans $recouvrements pour mettre à jour le solde
-                //     foreach ($recouvrements as $recouvrement) {
-                //         if ($recouvrement->idClient == $CT_Num) {
-                //             // Mettre à jour le solde courant avec le solde de la nouvelle requête
-                //             $client['total'] -= $recouvrement->solde;
-                //             break; // Sortir de la boucle dès qu'on a trouvé la correspondance
-                //         }
-                //     }
-                // }
-
 
     public function fusion()
     {
@@ -205,6 +236,7 @@ class MonController extends Controller
         return "Mise à jour de la colonne name de la table Portefeuille.";
     }
 
+
     public function enregistrerLigne(Request $request)
     {
         $request->validate([
@@ -212,110 +244,61 @@ class MonController extends Controller
             'idClient' => 'required',
         ]);
 
-
-        $id_agent = $request->input('id_agent');
-        $idClient = $request->input('idClient');
-        $ligne = $request->input('ligne');
-        $email = $request->input('email');
-        $num_facture = $request->input('num_facture');
-        $libelle = $request->input('libelle');
-        $telephone = $request->input('telephone');
-        $credit = $request->input('credit');
-        $debit = $request->input('debit');
-        $debit = $request->input('debit');
-
-
-        $libelle = $request->input('libelle');
-        // Vérifier si un enregistrement avec le même 'libelle' existe déjà
-        $existingRecord = DB::table('recouvrements')
-        ->where('libelle', $libelle)
-        ->first();
-
-        if (!$existingRecord) {
-            // Gérer le cas où un enregistrement avec le même 'libelle' existe déjà
-
-        DB::transaction(function () use ($ligne, $idClient, $libelle, $email, $telephone, $num_facture, $credit, $debit, $id_agent) {
-            DB::table('recouvrements')->insert([
-                'ligne' => $ligne,
-                'idClient' => $idClient,
-                'libelle' => $libelle,
-                'email' => $email,
-                'telephone' => $telephone,
-                'num_facture' => $num_facture,
-                'credit' => $credit,
-                'debit' => $debit,
-                'id_agent' => $id_agent,
-            ]);
-        });
-
-    // Ajouter le libellé à la liste des libellés ajoutés
-    $addedLibelles = session('addedLibelles', []);
-    $addedLibelles[] = $libelle;
-    session(['addedLibelles' => $addedLibelles]);
-
-    return redirect()->back()->with('message', 'Enregistrement inséré avec succès.');
-        }  return redirect()->back()->with('message', 'Un enregistrement avec le même libellé existe déjà.');
-    }
-
-
-
-
-
-    public function enregistrer_commentaire(Request $request){
-        $id_agent = $request->input('id_agent');
-        $idClient = $request->input('idClient');
-        $ligne = $request->input('ligne');
-        $email = $request->input('email');
-        $num_facture = $request->input('num_facture');
-        $libelle = $request->input('libelle');
-        $telephone = $request->input('telephone');
-        $message = $request->input('message');
-        $credit = $request->input('credit');
-        $debit = $request->input('debit');
-
-        DB::table('commentaires')->insert([
-            'ligne' => $ligne,
-            'idClient' => $idClient,
-            'libelle' => $libelle,
-            'email' => $email,
-            'telephone' => $telephone,
-            'num_facture' => $num_facture,
-            'credit' => $credit,
-            'debit' => $debit,
-            'message' => $message,
-            'id_agent' => $id_agent,
+        // Récupération des données du formulaire
+        $data = $request->only([
+            'ligne', 'idClient', 'libelle', 'email', 'telephone',
+            'num_facture', 'credit', 'debit', 'id_agent'
         ]);
 
-        return redirect()->back()->with('message', 'Message ajouter.');
+        // Vérifier si un enregistrement avec le même 'num_facture' existe déjà
+        $existingRecord = Recouvrement::where('num_facture', $data['num_facture'])->first();
+
+        if (!$existingRecord) {
+            // Utilisation du modèle Eloquent pour créer un nouvel enregistrement
+            $recouvrement = new Recouvrement();
+            $recouvrement->fill($data);
+            $recouvrement->save();
+
+            // Ajouter le num_facture à la liste des numéros ajoutés
+            $addedNumFactures = session('addedNumFactures', []);
+            $addedNumFactures[] = $data['num_facture'];
+            session(['addedNumFactures' => $addedNumFactures]);
+
+            return redirect()->back()->with('message', 'Enregistrement inséré avec succès.');
+        } else {
+            return redirect()->back()->with('message', 'Un enregistrement avec le même num_facture existe déjà.');
+        }
     }
 
 
-    // public function enregistrer_commentaire(Request $request){
-    //     $id_agent = $request->input('id_agent');
-    //     $idClient = $request->input('idClient');
-    //     $ligne = $request->input('ligne');
-    //     $email = $request->input('email');
-    //     $num_facture = $request->input('num_facture');
-    //     $libelle = $request->input('libelle');
-    //     $telephone = $request->input('telephone');
-    //     $message = $request->input('message');
-    //     $credit = $request->input('credit');
-    //     $debit = $request->input('debit');
 
-    //     // Affichage des données dans la console
-    //     dd([
-    //         'ligne' => $ligne,
-    //         'idClient' => $idClient,
-    //         'libelle' => $libelle,
-    //         'email' => $email,
-    //         'telephone' => $telephone,
-    //         'num_facture' => $num_facture,
-    //         'credit' => $credit,
-    //         'debit' => $debit,
-    //         'message' => $message,
-    //         'id_agent' => $id_agent,
-    //     ]);
-    // }
+
+
+
+    public function enregistrer_commentaire(Request $request)
+    {
+        $data = $request->only([
+            'id_agent',
+            'idClient',
+            'ligne',
+            'email',
+            'num_facture',
+            'libelle',
+            'telephone',
+            'message',
+            'credit',
+            'debit',
+        ]);
+
+        // dd($data);
+
+        Commentaire::create($data);
+
+        return redirect()->back()->with('message', 'Message ajouté.');
+    }
+
+
+
 
 
     // À chaque lancement de l'application
@@ -335,10 +318,25 @@ class MonController extends Controller
         return view('les_recouvres', compact('data'));
     }
 
-    public function client_rappel($id){
-        $data = Commentaire::all()->where("id_agent", "=", $id);
-        return view('rappels', compact('data'));
-    }
+    public function client_rappel($id)
+{
+    // Récupérer les commentaires pour un agent spécifique en excluant ceux dont le num_facture est dans recouvrements
+    $data = DB::table('commentaires')
+        ->where('id_agent', '=', $id)
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                  ->from('recouvrements')
+                  ->whereRaw('recouvrements.num_facture = commentaires.num_facture');
+        })
+        ->select('commentaires.*') // Sélectionnez les colonnes que vous souhaitez obtenir
+        ->get();
+        // dd($data);
+
+    return view('rappels', compact('data'));
+}
+
+
+
 
 
     public function supprimer_ligne($id)
@@ -356,29 +354,7 @@ class MonController extends Controller
 
 
 
-    public function viens(Request $request){
-        $id_agent = $request->input('id_agent');
-        $idClient = $request->input('idClient');
-        $ligne = $request->input('ligne');
-        $email = $request->input('email');
-        $num_facture = $request->input('num_facture');
-        $libelle = $request->input('libelle');
-        $telephone = $request->input('telephone');
-        $credit = $request->input('credit');
-        $debit = $request->input('debit');
 
-        // Utilisation de dd() pour afficher les valeurs
-        dd([
-            'id_agent' => $id_agent,
-            'idClient' => $idClient,
-            'ligne' => $ligne,
-            'email' => $email,
-            'num_facture' => $num_facture,
-            'libelle' => $libelle,
-            'telephone' => $telephone,
-            'credit' => $credit,
-            'debit' => $debit,
-        ]);
-    }
+
 }
 

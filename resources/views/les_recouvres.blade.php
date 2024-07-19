@@ -14,22 +14,24 @@
 
 
 <div class="container my-3">
-    <h1 class="text-uppercase text-bg-primary text-center">Les clients récouvrés</h1>
+    <h3 class="text-uppercase text-bg-primary text-center">Les clients récouvrés</h3>
 </div>
 <div id="moa">
     @if ($data->isNotEmpty())
+    <button class="btn btn-primary imprimer-bouton my-1"><a href="/home" class="text-light"><i class="bi bi-arrow-left">Retour</i></a></button>
         @php
             // Récupération du CT_Num du premier élément de la collection
             $firstCTNum = $data->first()->idClient;
         @endphp
-        <div class="container my-3 mia">
+        {{-- <div class="container my-3 mia">
             <!-- Bouton de retour avec le lien dynamique si les données existent -->
             <a id="retourButton" href="/details/{{ $firstCTNum }}" class="btn btn-primary imprimer-bouton retour-bouton mx-0">
                 <i class="bi bi-arrow-left"></i> Retour
             </a>
-        </div>
+
+        </div> --}}
     @else
-        <div class="container my-3">
+        <div class="container my-2">
             <!-- Bouton de retour qui appelle une fonction JavaScript si les données n'existent pas -->
             <button class="btn btn-primary imprimer-bouton retour-bouton mx-0" onclick="retourPagePrecedente()">
                 <i class="bi bi-arrow-left"></i> Retour
@@ -47,8 +49,8 @@
                         <th>Email</th>
                         <th>Téléphone</th>
                         <th>N° facture</th>
-                        <th>Débit</th>
-                        <th>Crédit</th>
+                        <th>Montant</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,8 +66,8 @@
                             <td>{{ !empty($donnee->CT_EMail) ? $donnee->CT_EMail : 'emailClient@gmail.com' }}</td>
                             <td>{{ $donnee->telephone }}</td>
                             <td>{{ $donnee->num_facture }}</td>
-                            <td>{{ $donnee->credit }}</td>
-                            <td>{{ $donnee->debit }}</td>
+                            <td>{{ number_format($donnee->debit, 0, ' ', ' ') }}</td>
+                            <td>{{ date('d/m/Y H:i:s', strtotime($donnee->created_at)) }}</td>
                         </tr>
                     @endforeach
                 </tbody>

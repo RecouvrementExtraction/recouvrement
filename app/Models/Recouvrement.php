@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,4 +21,7 @@ class Recouvrement extends Model
         "debit",
         "id_agent"
     ];
+
+     // Assurez-vous que le modèle utilise bien les timestamps
+     public $timestamps = true;
 }

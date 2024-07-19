@@ -22,8 +22,8 @@
                         <th>Email</th>
                         <th>Téléphone</th>
                         <th>N° facture</th>
-                        <th>Débit</th>
-                        <th>Crédit</th>
+                        <th>Montant</th>
+                        <th class="hidden">Crédit</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -40,8 +40,8 @@
                             <td>{{ !empty($donnee->CT_EMail) ? $donnee->CT_EMail : 'emailClient@gmail.com' }}</td>
                             <td>{{ $donnee->telephone }}</td>
                             <td>{{ $donnee->num_facture }}</td>
-                            <td>{{ $donnee->credit }}</td>
-                            <td>{{ $donnee->debit }}</td>
+                            <td>{{ number_format($donnee->debit, 0, ' ', ' ') }}</td>
+                            <td class="hidden">{{ $donnee->credit }}</td>
                             <td>
                                 <form action="/factures_recouvrees/{{$donnee->idClient}}" method="post" class="d-inline delete-form">
                                     @csrf

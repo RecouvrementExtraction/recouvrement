@@ -31,12 +31,16 @@
                             <thead>
                                 <tr>
                                     <th>Numéro</th>
+                                    <th>Email</th>
+                                    <th>Téléphone</th>
                                     <th>Intitulé</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr class="text-center justeM">
                                     <td class="text-center justeM">{{ $data[0]->CT_Num }}</td>
+                                    <td class="text-center justeM">{{ $data[0]->CT_EMail }}</td>
+                                    <td class="text-center justeM">{{ $data[0]->CT_Telephone }}</td>
                                     <td class="text-center justeM">{{ $data[0]->CT_Intitule }}</td>
                                 </tr>
                             </tbody>
@@ -57,14 +61,14 @@
                 <thead>
                     <tr>
                         <th>Ligne</th>
-                        <th>Téléphone</th>
-                        <th>Email</th>
+                        <th class="hidden">Téléphone</th>
+                        <th class="hidden">Email</th>
                         <th>N° facture</th>
                         <th>Libellé</th>
                         <th>Echeance</th>
                         <th>Rétard</th>
-                        <th>Débit</th>
-                        <th>Crédit</th>
+                        <th>Montant</th>
+                        <th class="hidden">Crédit</th>
                         <th>Action</th>
                         <th class="col-2">Rappel</th>
                     </tr>
@@ -80,11 +84,11 @@
                             $amount = $donnee->Ec_Montant;
                             $format = number_format($amount, 0, ' ', ' ');
                         @endphp
-                        @if(!in_array($donnee->EC_Intitule, session('addedLibelles', [])))
+                        @if(!in_array($donnee->EC_RefPiece, session('addedLibelles', [])))
                             <tr data-ct-num="{{ $donnee->CT_Num }}">
                                 <td class="table-cell">{{ $donnee->CO_Nom }}</td>
-                                <td class="table-cell">{{ $donnee->CT_Telephone }}</td>
-                                <td class="table-cell">{{ !empty($donnee->CT_EMail) ? $donnee->CT_EMail : 'emailClient@gmail.com' }}</td>
+                                <td class="table-cell hidden">{{ $donnee->CT_Telephone }}</td>
+                                <td class="table-cell hidden">{{ !empty($donnee->CT_EMail) ? $donnee->CT_EMail : 'emailClient@gmail.com' }}</td>
                                 <td class="table-cell">{{ $donnee->EC_RefPiece }}</td>
                                 <td class="table-cell">{{ $donnee->EC_Intitule }}</td>
                                 <td class="table-cell">{{ (new DateTime($donnee->EC_Echeance))->format('d/m/Y') }}</td>
@@ -109,10 +113,9 @@
                                 <td class="hidden">
                                     @php
                                         $debitValue = ($donnee->EC_sens <= 0) ? $donnee->Ec_Montant : 0;
-                                        $totalDebit += $debitValue;
                                     @endphp
                                 </td>
-                                <td>
+                                <td class="hidden">
                                     @php
                                         if ($donnee->EC_sens > 0) {
                                             echo $format;
@@ -124,11 +127,11 @@
                                 <td class="hidden">
                                     @php
                                         $creditValue = ($donnee->EC_sens > 0) ? $donnee->Ec_Montant : 0;
-                                        $totalCredit += $creditValue;
                                     @endphp
                                 </td>
+
                                 <td>
-                                    <form action="{{ route('enregistrer_ligne') }}" method="post" class="text-center">
+                                    <form action="{{ route('enregistrer_ligne') }}" method="post" class="text-center confirmation-form">
                                         @csrf
                                         <input type="hidden" name="id_agent" value="{{ auth()->user()->id }}">
                                         <input type="hidden" name="idClient" value="{{ $donnee->CT_Num }}">
@@ -138,9 +141,9 @@
                                         <input type="hidden" name="num_facture" value="{{ $donnee->EC_RefPiece }}">
                                         <input type="hidden" name="libelle" value="{{ $donnee->EC_Intitule }}">
                                         <input type="hidden" name="echeance" value="{{ $donnee->EC_Echeance }}">
-                                        <input type="hidden" name="debit" value="{{ $totalDebit }}">
-                                        <input type="hidden" name="credit" value="{{ $totalCredit }}">
-                                        <button type="submit" class="btn btn-success btn-sm">
+                                        <input type="hidden" name="debit" value="{{ $debitValue }}">
+                                        <input type="hidden" name="credit" value="{{ $creditValue }}">
+                                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirmAction('{{ $donnee->EC_RefPiece }}');">
                                             <i class="bi bi-check-circle" title="Récouvrer"></i>
                                         </button>
                                     </form>
@@ -162,8 +165,8 @@
                                         <input type="hidden" name="email" value="emailClient@gmail.com">
                                         <input type="hidden" name="num_facture" value="{{ $donnee->EC_RefPiece }}">
                                         <input type="hidden" name="libelle" value="{{ $donnee->EC_Intitule }}">
-                                        <input type="hidden" name="debit" value="{{ $totalDebit }}">
-                                        <input type="hidden" name="credit" value="{{ $totalCredit }}">
+                                        <input type="hidden" name="debit" value="{{ $debitValue }}">
+                                        <input type="hidden" name="credit" value="{{ $creditValue }}">
                                         <input type="hidden" id="date_{{ $donnee->CT_Num }}" name="message" value="Monace">
                                     </form>
 
@@ -173,22 +176,15 @@
                     @endforeach
                 </tbody>
             </table>
-
-            <!-- Pagination -->
-            <div class="d-flex justify-content-center">
+            <div class="text-center my-3">
                 {{ $data->links() }}
             </div>
-
             <div class="mb-3 justify-content-center">
-                @php
-                    $solde1 = $totalDebit - $totalCredit;
-                @endphp
-                <span class="total-debit">Total Débit : {{ number_format($totalDebit, 0, ' ', ' ') }}</span>
-                <span class="total-credit">Total Crédit : {{ number_format($totalCredit, 0, ' ', ' ') }}</span>
-                <span class="solde">Solde : {{ number_format($solde1, 0, ' ', ' ') }}</span>
+                <h4 class="variation-solde">Solde Total : {{ number_format($totalSolde, 0, ' ', ' ') }} FCFA</h4>
             </div>
         </div>
     </div>
+
 
     <!-- Boutons d'impression et de navigation -->
     <div class="btn-group m-2">
@@ -255,6 +251,11 @@
         });
 
 
+        //Confirmation de recouvrement
+        function confirmAction(refPiece) {
+        var confirmation = confirm("Voulez-vous recouvrer la facture " + refPiece + " ?");
+        return confirmation;
+    }
 
 </script>
 @endsection

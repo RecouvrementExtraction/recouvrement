@@ -5,3 +5,26 @@
     margin-top: 10px; /* 10px de marge en haut */
     margin-bottom: 10px; /* 10px de marge en bas */
 }
+
+
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+th, td {
+    word-wrap: break-word;
+}
+
+.col-2 {
+    width: 16.6667%;
+}
+
+.col-1 {
+    width: 8.3333%;
+}

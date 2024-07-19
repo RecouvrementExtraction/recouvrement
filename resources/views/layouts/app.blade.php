@@ -51,7 +51,7 @@
     <div id="app" class="d-flex flex-column min-vh-100">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm imprimer-bouton fixed-top">
             <div>
-                <img src="/images/log.png" alt="Logo de l'entreprise" height="50" width="100">
+                <img src="/images/igf.png" alt="Logo de l'entreprise" height="50" width="100">
             </div>
             <div class="container">
                 {{-- <a class="navbar-brand custom-register-link" href="{{ url('/home') }}">
@@ -85,7 +85,7 @@
                             </li>
                         @endauth
 
-                        @guest
+                        {{-- @guest
                             @if (Route::has('register'))
                                 <li class="nav-item">
                                     <a href="{{ route('register') }}" class="nav-link custom-register-link">
@@ -93,7 +93,7 @@
                                     </a>
                                 </li>
                             @endif
-                        @endguest
+                        @endguest --}}
 
                         @auth
                             <li class="nav-item dropdown">
@@ -121,9 +121,6 @@
                 </div>
             </div>
         </nav>
-
-
-
         <main class="flex-grow-1 mt-5"  style="padding-top: 70px;">
             @yield('content')
         </main>

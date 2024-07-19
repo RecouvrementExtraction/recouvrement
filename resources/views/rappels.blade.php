@@ -48,23 +48,23 @@
                         <th>Email</th>
                         <th>Téléphone</th>
                         <th>N° facture</th>
-                        <th>Débit</th>
-                        <th>Crédit</th>
+                        <th>Montant</th>
+                        <th class="hidden">Crédit</th>
                         <th>Date</th>
                         <th>Action</th> <!-- Nouvelle colonne pour les actions -->
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($data as $donnee)
-                        <tr id="ligne_{{ $donnee->id }}" data-ct-num="{{ $donnee->CT_Num }}">
+                        <tr id="ligne_{{ $donnee->id }}">
                             <td>{{ $donnee->ligne }}</td>
                             <td>{{ $donnee->idClient }}</td>
                             <td>{{ $donnee->libelle }}</td>
                             <td>{{ !empty($donnee->CT_EMail) ? $donnee->CT_EMail : 'emailClient@gmail.com' }}</td>
                             <td>{{ $donnee->telephone }}</td>
                             <td>{{ $donnee->num_facture }}</td>
-                            <td>{{ $donnee->credit }}</td>
-                            <td>{{ $donnee->debit }}</td>
+                            <td>{{ number_format($donnee->debit, 0, ' ', ' ') }}</td>
+                            <td class="hidden">{{ $donnee->credit }}</td>
                             <td>{{ $donnee->message }}</td>
                             <td>
                                 <div class="btn-group" role="group">

@@ -5,8 +5,17 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             {{-- <div class="my-3" title="Ajouter un agent">
-                <a href="/ajoute_user" class="btn btn-primary"> <i class="bi bi-plus"></i></a>
+                <a href="{{ route('register') }}" class="btn btn-primary"> <i class="bi bi-plus"></i></a>
             </div> --}}
+
+
+                <button class="btn btn-primary">
+                    <a href="{{ route('register') }}" class="nav-link custom-register-link">
+                        {{ __("Ajouter") }}
+                    </a>
+                </button>
+
+
             <div class="card mt-5">
                 <div class="card-header"><h3>List des Agents</h3></div>
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\MonController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\MoussaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,6 +57,8 @@ Route::delete('/factures_recouvrees/{idClient}', [UserController::class, 'factur
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// Route::get('/moussa', [MonController::class, 'moussa'])->name('moussa');
 
 Route::namespace('')->prefix('admin')->name('admin.')->middleware('can:manage-users')->group(function () {
     Route::resource('users', UserController::class, [
